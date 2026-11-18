@@ -1,0 +1,1 @@
+# 售后报修智能分诊平台`n`n项目目标：辅助客服检查报修信息、判断故障类别与紧急度、检索维修知识，并在信息不足或不确定时建议补问或转人工。所有建议由客服确认。`n`n## 技术栈`n`n- Python + Flask + Jinja2 + Bootstrap`n- SQLite + Flask-SQLAlchemy`n- scikit-learn：TF-IDF 与朴素贝叶斯`n`n## 项目状态`n`n当前为项目骨架，功能将按 README 中确认的模块逐步实现。
