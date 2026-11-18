@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}提交报修 - 售后报修智能分诊平台{% endblock %}
+
+{% block content %}
+<div class="page-card">
+    <h1 class="page-title">提交报修</h1>
+    <p class="page-hint">带 <span class="required">*</span> 为必填项。带"未知"的选项在不确定时请选择"未知"，不要留空或默认选"否"。</p>
+
+    {% if errors %}
+    <div class="alert alert-error">
+        <strong>提交未成功，请检查：</strong>
+        <ul>
+            {% for err in errors %}<li>{{ err }}</li>{% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('tickets.new_ticket') }}" class="ticket-form">
+        <div class="form-row">
+            <div class="form-field">
+                <label for="equipment_type">设备类型 <span class="required">*</span></label>
+                <select id="equipment_type" name="equipment_type">
+                    <option value="UNKNOWN" {% if form.equipment_type == 'UNKNOWN' %}selected{% endif %}>未知</option>
+                    <option value="CNC" {% if form.equipment_type == 'CNC' %}selected{% endif %}>数控机床</option>
+                    <option value="INJECTION" {% if form.equipment_type == 'INJECTION' %}selected{% endif %}>注塑机</option>
+                    <option value="CONVEYOR" {% if form.equipment_type == 'CONVEYOR' %}selected{% endif %}>输送设备</option>
+                    <option value="OTHER" {% if form.equipment_type == 'OTHER' %}selected{% endif %}>其他</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="equipment_model">设备型号 <span class="required">*</span></label>
+                <input id="equipment_model" name="equipment_model" type="text" value="{{ form.equipment_model }}" placeholder="如 CNC-850">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="equipment_code">设备编号</label>
+                <input id="equipment_code" name="equipment_code" type="text" value="{{ form.equipment_code }}" placeholder="如 EQ-001，可留空">
+            </div>
+            <div class="form-field">
+                <label for="occurred_at">故障发生时间</label>
+                <input id="occurred_at" name="occurred_at" type="text" value="{{ form.occurred_at }}" placeholder="如 2026-11-18 09:30，可留空">
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label for="description">故障现象描述 <span class="required">*</span></label>
+            <textarea id="description" name="description" rows="4" placeholder="描述观察到的现象，10 字以上">{{ form.description }}</textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="operating_state">发生时运行状态</label>
+                <select id="operating_state" name="operating_state">
+                    {% for value, label in [('UNKNOWN','未知'),('STARTING','启动中'),('RUNNING','运行中'),('STANDBY','待机'),('STOPPED','停机')] %}
+                    <option value="{{ value }}" {% if form.operating_state == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="shutdown">设备是否停机 <span class="required">*</span></label>
+                <select id="shutdown" name="shutdown">
+                    {% for value, label in [('UNKNOWN','未知'),('YES','是'),('NO','否')] %}
+                    <option value="{{ value }}" {% if form.shutdown == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="safety_risk">是否存在安全风险 <span class="required">*</span></label>
+                <select id="safety_risk" name="safety_risk">
+                    {% for value, label in [('UNKNOWN','未知'),('YES','是'),('NO','否')] %}
+                    <option value="{{ value }}" {% if form.safety_risk == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="alarm_code_status">报警代码状态 <span class="required">*</span></label>
+                <select id="alarm_code_status" name="alarm_code_status">
+                    {% for value, label in [('UNKNOWN','不清楚'),('PRESENT','有代码'),('NONE','无报警')] %}
+                    <option value="{{ value }}" {% if form.alarm_code_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label for="alarm_code">报警代码（有代码时必填）</label>
+                <input id="alarm_code" name="alarm_code" type="text" value="{{ form.alarm_code }}" placeholder="如 E104">
+            </div>
+            <div class="form-field">
+                <label for="submitter_note">补充说明</label>
+                <input id="submitter_note" name="submitter_note" type="text" value="{{ form.submitter_note }}" placeholder="可留空">
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">提交报修</button>
+            <a href="{{ url_for('tickets.list_tickets') }}" class="btn btn-secondary">取消</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; font-size: 14px; color: #222; background: #f5f7fa; }
+a { color: #1a6fc4; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.site-header { background: #1f3a5f; color: #fff; }
+.header-inner { max-width: 960px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+.site-title { color: #fff; font-size: 17px; font-weight: 600; }
+.site-nav a { color: #dce8f5; margin-left: 20px; }
+.container { max-width: 960px; margin: 24px auto; padding: 0 20px; }
+
+.page-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px 28px; }
+.page-title { margin: 0 0 8px; font-size: 20px; }
+.page-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.page-heading .page-title { margin: 0; }
+.section-title { font-size: 16px; margin: 24px 0 10px; border-left: 3px solid #1a6fc4; padding-left: 8px; }
+.page-hint { color: #666; font-size: 13px; margin: 0 0 18px; }
+.required { color: #c0392b; }
+.empty-hint { color: #666; padding: 24px 0; text-align: center; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-field { margin-bottom: 16px; }
+.form-field label { display: block; margin-bottom: 6px; font-weight: 600; }
+.form-field input, .form-field select, .form-field textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px;
+    font-size: 14px; font-family: inherit;
+}
+.form-field textarea { resize: vertical; }
+.form-actions { margin-top: 8px; }
+.btn { display: inline-block; padding: 8px 16px; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-size: 14px; }
+.btn-primary { background: #1a6fc4; color: #fff; }
+.btn-secondary { background: #fff; color: #333; border-color: #cbd5e1; }
+
+.alert { padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; }
+.alert-error { background: #fdecea; color: #a5281b; border: 1px solid #f5c6c0; }
+.alert-success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+.alert ul { margin: 6px 0 0; }
+
+.ticket-table, .detail-table { width: 100%; border-collapse: collapse; }
+.ticket-table th, .ticket-table td, .detail-table th, .detail-table td {
+    border: 1px solid #e2e8f0; padding: 9px 10px; text-align: left;
+}
+.ticket-table th, .detail-table th { background: #f7f9fc; font-weight: 600; }
+.detail-table th { width: 150px; }
+.status-badge { background: #eef2f7; border-radius: 10px; padding: 2px 8px; font-size: 12px; }
