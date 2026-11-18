@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "local-development-only")
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URL", f"sqlite:///{ROOT / 'instance' / 'triage.db'}"
+        "DATABASE_URL", f"sqlite:///{ROOT / '本地运行数据' / 'triage.db'}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
