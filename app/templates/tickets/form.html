@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-card">
     <h1 class="page-title">提交报修</h1>
-    <p class="page-hint">带 <span class="required">*</span> 为必填项。带"未知"的选项在不确定时请选择"未知"，不要留空或默认选"否"。</p>
+    <p class="page-hint">带 <span class="required">*</span> 为必填项。设备类型不确定时选“其他设备/不清楚”；设备型号不清楚可留空（建议先查看设备铭牌）。三值选项不确定时选“未知”，不要留空或默认选“否”。</p>
 
     {% if errors %}
     <div class="alert alert-error">
@@ -20,16 +20,17 @@
             <div class="form-field">
                 <label for="equipment_type">设备类型 <span class="required">*</span></label>
                 <select id="equipment_type" name="equipment_type">
-                    <option value="UNKNOWN" {% if form.equipment_type == 'UNKNOWN' %}selected{% endif %}>未知</option>
-                    <option value="CNC" {% if form.equipment_type == 'CNC' %}selected{% endif %}>数控机床</option>
+                    <option value="CNC" {% if form.equipment_type == 'CNC' %}selected{% endif %}>数控机床/加工设备</option>
                     <option value="INJECTION" {% if form.equipment_type == 'INJECTION' %}selected{% endif %}>注塑机</option>
-                    <option value="CONVEYOR" {% if form.equipment_type == 'CONVEYOR' %}selected{% endif %}>输送设备</option>
-                    <option value="OTHER" {% if form.equipment_type == 'OTHER' %}selected{% endif %}>其他</option>
+                    <option value="CONVEYOR" {% if form.equipment_type == 'CONVEYOR' %}selected{% endif %}>输送线/传送带</option>
+                    <option value="AIR_COMPRESSOR" {% if form.equipment_type == 'AIR_COMPRESSOR' %}selected{% endif %}>空压机</option>
+                    <option value="VFD" {% if form.equipment_type == 'VFD' %}selected{% endif %}>电机控制箱/变频器</option>
+                    <option value="OTHER" {% if form.equipment_type == 'OTHER' %}selected{% endif %}>其他设备/不清楚</option>
                 </select>
             </div>
             <div class="form-field">
-                <label for="equipment_model">设备型号 <span class="required">*</span></label>
-                <input id="equipment_model" name="equipment_model" type="text" value="{{ form.equipment_model }}" placeholder="如 CNC-850">
+                <label for="equipment_model">设备型号</label>
+                <input id="equipment_model" name="equipment_model" type="text" value="{{ form.equipment_model }}" placeholder="请查看设备铭牌；不清楚可留空">
             </div>
         </div>
 

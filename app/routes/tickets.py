@@ -19,7 +19,7 @@ tickets_bp = Blueprint("tickets", __name__)
 TRI_STATE = {"YES", "NO", "UNKNOWN"}
 ALARM_STATUS = {"PRESENT", "NONE", "UNKNOWN"}
 OPERATING_STATE = {"STARTING", "RUNNING", "STANDBY", "STOPPED", "UNKNOWN"}
-EQUIPMENT_TYPE = {"UNKNOWN", "CNC", "INJECTION", "CONVEYOR", "OTHER"}
+EQUIPMENT_TYPE = {"CNC", "INJECTION", "CONVEYOR", "AIR_COMPRESSOR", "VFD", "OTHER"}
 
 # 表单需要回显的字段（系统生成字段不在此列）
 FORM_FIELDS = [
@@ -31,7 +31,7 @@ FORM_FIELDS = [
 
 def default_form():
     return {
-        "equipment_type": "UNKNOWN",
+        "equipment_type": "OTHER",
         "equipment_model": "",
         "equipment_code": "",
         "description": "",
@@ -57,8 +57,6 @@ def validate(form):
 
     if form["equipment_type"] not in EQUIPMENT_TYPE:
         errors.append("设备类型取值无效。")
-    if not form["equipment_model"].strip():
-        errors.append("设备型号不能为空。")
     if len(form["description"].strip()) < 10:
         errors.append("故障现象描述不能为空，且不少于 10 个字。")
     if form["shutdown"] not in TRI_STATE:
@@ -88,7 +86,7 @@ def new_ticket():
     ticket = Ticket(
         ticket_id=generate_ticket_id(),
         equipment_type=form["equipment_type"],
-        equipment_model=form["equipment_model"].strip(),
+        equipment_model=form["equipment_model"].strip() or None,
         equipment_code=form["equipment_code"].strip() or None,
         description=form["description"].strip(),
         occurred_at=form["occurred_at"].strip() or None,

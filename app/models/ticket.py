@@ -8,7 +8,7 @@ class Ticket(db.Model):
     # 一、报修人提交字段
     ticket_id = db.Column(db.String(32), primary_key=True)
     equipment_type = db.Column(db.String(32), nullable=False)
-    equipment_model = db.Column(db.String(64), nullable=False)
+    equipment_model = db.Column(db.String(64))
     equipment_code = db.Column(db.String(64))
     description = db.Column(db.Text, nullable=False)
     occurred_at = db.Column(db.DateTime)
@@ -29,6 +29,8 @@ class Ticket(db.Model):
     missing_fields = db.Column(db.JSON)
     follow_up_questions = db.Column(db.JSON)
     knowledge_ids = db.Column(db.JSON)
+    reference_knowledge_ids = db.Column(db.JSON)
+    knowledge_match_level = db.Column(db.String(16))
     recommend_human = db.Column(db.Boolean, default=False)
     handoff_reasons = db.Column(db.JSON)
     model_version = db.Column(db.String(32))
