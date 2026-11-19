@@ -1,0 +1,8 @@
+asset_token,equipment_type,equipment_category,brand,equipment_model,controller_system,software_version,site_token,data_owner,service_status,knowledge_scope_confirmed,updated_at
+BASELINE-VF2-001,CNC立式加工中心,CNC_MACHINING,Haas Automation,VF-2,Haas NGC,具体软件版本需以现场控制器为准,PUBLIC-BASELINE,平台基准设备,资料建档,是,2026-11-19
+BASELINE-EMAC-001,全电动注塑机,INJECTION_MOLDING,ENGEL,e-mac 195,CC300,具体软件版本需以现场控制器为准,PUBLIC-BASELINE,平台基准设备,资料建档,是,2026-11-19
+BASELINE-DORNER-001,工业皮带输送机,CONVEYOR,Dorner,2200 Series,驱动与控制配置需以现场设备为准,具体配置需以现场设备为准,PUBLIC-BASELINE,平台基准设备,资料建档,是,2026-11-19
+BASELINE-GA22-001,喷油螺杆空气压缩机,AIR_COMPRESSOR,Atlas Copco,GA22 P,Elektronikon Swipe,具体控制器版本需以现场设备为准,PUBLIC-BASELINE,平台基准设备,资料建档,是,2026-11-19
+BASELINE-SIEMENS-808D-001,数控控制器,CNC_CONTROL,Siemens,SINUMERIK 808D ADVANCED,SINUMERIK 808D ADVANCED,具体软件版本需以现场控制器为准,PUBLIC-BASELINE,平台基准设备,资料建档,是,2026-11-19
+BASELINE-SCHNEIDER-ATV320-001,通用变频器,VARIABLE_FREQUENCY_DRIVE,Schneider Electric,Altivar 320,ATV320 integrated control,具体固件版本需以现场变频器为准,PUBLIC-BASELINE,平台基准设备,资料建档,是,2026-11-19
+BASELINE-ABB-ACS580-001,通用变频器,VARIABLE_FREQUENCY_DRIVE,ABB,ACS580-01,ACS580 standard control program,ACS580-FW-J,PUBLIC-BASELINE,平台基准设备,资料建档,是,2026-11-19
