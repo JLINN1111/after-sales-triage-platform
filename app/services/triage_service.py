@@ -1,6 +1,7 @@
 """统一分诊入口：合并规则分诊与可插拔的知识匹配结果。"""
 
 from collections.abc import Callable, Mapping
+from types import SimpleNamespace
 from typing import Any
 
 from app.algorithms.rules import triage_ticket as run_rules
@@ -8,6 +9,26 @@ from app.algorithms.rules import triage_ticket as run_rules
 
 KnowledgeMatcher = Callable[[Mapping[str, Any] | Any, Mapping[str, Any]], Mapping[str, Any]]
 _MATCH_LEVELS = {"EXACT", "REFERENCE", "NONE"}
+SUPPLEMENT_FIELDS = (
+    "equipment_model", "equipment_code", "operating_state", "shutdown",
+    "safety_risk", "alarm_code_status", "alarm_code",
+)
+
+
+def effective_ticket(ticket: Mapping[str, Any] | Any) -> Mapping[str, Any] | Any:
+    """合并客户后续补充的信息，用于重新分诊但不改写原始报修字段。"""
+
+    if isinstance(ticket, Mapping) or not hasattr(ticket, "actions"):
+        return ticket
+    values = {field: getattr(ticket, field, None) for field in SUPPLEMENT_FIELDS}
+    values["equipment_type"] = getattr(ticket, "equipment_type", None)
+    values["description"] = getattr(ticket, "description", None)
+    for action in ticket.actions or []:
+        if action.action_type != "SUPPLEMENT":
+            continue
+        fields = (action.new_values or {}).get("supplemental_fields", {})
+        values.update({field: value for field, value in fields.items() if field in SUPPLEMENT_FIELDS})
+    return SimpleNamespace(**values)
 
 
 def _append_once(values: list[str], value: str) -> None:
@@ -59,10 +80,11 @@ def triage_ticket(
     未提供匹配器时只返回规则分诊，`knowledge_pending=True` 表示尚未检索。
     """
 
-    result = run_rules(ticket)
+    ticket_for_triage = effective_ticket(ticket)
+    result = run_rules(ticket_for_triage)
     result.update(_knowledge_defaults())
 
     if knowledge_matcher is not None:
-        _merge_knowledge_result(result, knowledge_matcher(ticket, result))
+        _merge_knowledge_result(result, knowledge_matcher(ticket_for_triage, result))
 
     return result

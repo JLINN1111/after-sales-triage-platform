@@ -46,7 +46,7 @@ DISPLAY = {
     "alarm_status": {"PRESENT": "有报警代码", "NONE": "无报警", "UNKNOWN": "不清楚"},
     "action": {
         "FOLLOW_UP": "补问信息", "HANDOFF": "转人工处理", "CONFIRM": "确认分诊",
-        "EDIT": "修订确认结果", "CLOSE": "关闭工单",
+        "SUPPLEMENT": "录入客户补充信息", "EDIT": "修订确认结果", "CLOSE": "关闭工单",
     },
     "action_status": {
         "NEW": "待处理", "NEED_INFO": "待补充信息", "HUMAN_REVIEW": "人工复核中",
@@ -102,6 +102,36 @@ def knowledge_details(ids, fallback_ids=None):
         }
         for kid in picked if kid in index
     ]
+
+
+def action_detail(action):
+    """把操作留痕中的结构化前后值转换为客服可读的说明。"""
+
+    values = action.new_values or {}
+    if action.action_type == "FOLLOW_UP":
+        return values.get("customer_follow_up") or action.action_note or "-"
+    if action.action_type == "SUPPLEMENT":
+        fields = values.get("supplemental_fields", {})
+        labels = {
+            "equipment_model": "设备型号", "equipment_code": "设备编号",
+            "operating_state": "运行状态", "shutdown": "是否停机",
+            "safety_risk": "安全风险", "alarm_code_status": "报警代码状态",
+            "alarm_code": "报警代码",
+        }
+        return "；".join(
+            f"{labels[field]}：{DISPLAY['operating'].get(value, DISPLAY['tri'].get(value, DISPLAY['alarm_status'].get(value, value)))}"
+            for field, value in fields.items() if field in labels
+        ) or "-"
+    if action.action_type in {"CONFIRM", "EDIT"}:
+        parts = []
+        if values.get("confirmed_category"):
+            parts.append(f"确认类别：{DISPLAY['category'].get(values['confirmed_category'], values['confirmed_category'])}")
+        if values.get("confirmed_priority"):
+            parts.append(f"确认优先级：{DISPLAY['priority'].get(values['confirmed_priority'], values['confirmed_priority'])}")
+        if action.action_note:
+            parts.append(f"说明：{action.action_note}")
+        return "；".join(parts) or "-"
+    return action.action_note or "-"
 
 # 统一分诊结果写回工单的字段（triaged_at 是字符串，需转 datetime）
 RESULT_FIELDS = [
@@ -242,8 +272,11 @@ def ticket_action(ticket_id):
             return jsonify({"error": str(error)}), 400
         flash(str(error))
         return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
-
     db.session.add(action)
+    if action.action_type == "SUPPLEMENT":
+        result = apply_triage(ticket)
+        action.state_after = ticket.action_status
+        action.new_values["retriaged_status"] = ticket.action_status
     db.session.commit()
     if request.is_json:
         return jsonify({
@@ -261,6 +294,7 @@ def ticket_detail(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     match_level = ticket.knowledge_match_level
     has_handoff = any(action.action_type == "HANDOFF" for action in ticket.actions)
+    action_details = {action.id: action_detail(action) for action in ticket.actions}
     return render_template(
         "tickets/detail.html",
         ticket=ticket,
@@ -275,4 +309,6 @@ def ticket_detail(ticket_id):
         handoff_zh=[DISPLAY["evidence"].get(r, r) for r in (ticket.handoff_reasons or [])],
         close_requires_handoff=needs_handoff_before_close(ticket),
         has_handoff=has_handoff,
+        action_details=action_details,
+        action_note_required=(ticket.action_status == "HUMAN_REVIEW" or needs_handoff_before_close(ticket)),
     )

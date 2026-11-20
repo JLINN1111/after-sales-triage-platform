@@ -22,7 +22,7 @@
         <tr><th>报警代码状态</th><td>{{ display.alarm_status.get(ticket.alarm_code_status, ticket.alarm_code_status) }}</td></tr>
         <tr><th>报警代码</th><td>{{ ticket.alarm_code or '-' }}</td></tr>
         <tr><th>补充说明</th><td>{{ ticket.submitter_note or '-' }}</td></tr>
-        <tr><th>处理状态</th><td><span class="status-badge">{{ ticket.action_status }}</span></td></tr>
+        <tr><th>处理状态</th><td><span class="status-badge">{{ display.action_status.get(ticket.action_status, ticket.action_status) }}</span></td></tr>
         <tr><th>提交时间</th><td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') if ticket.created_at else '-' }}</td></tr>
     </table>
 
@@ -45,6 +45,15 @@
 
     <h2 class="section-title">客服处理</h2>
     <p class="page-hint">当前处理状态：<span class="status-badge">{{ display.action_status.get(ticket.action_status, ticket.action_status) }}</span></p>
+    {% if ticket.action_status == 'HUMAN_REVIEW' %}
+    <p class="page-hint">下一步：仍需升级现场人员时记录转人工；仍缺资料时记录补问；已取得人工核对结论时填写核对说明并确认分诊。</p>
+    {% elif ticket.action_status == 'NEED_INFO' %}
+    <p class="page-hint">下一步：收到客户回复后，先录入客户补充信息并重新分诊；仍缺资料时可继续补问。</p>
+    {% elif ticket.action_status == 'NEW' %}
+    <p class="page-hint">下一步：核对系统建议后确认分诊；如资料不足则记录补问，如需现场处理则转人工。</p>
+    {% elif ticket.action_status == 'CONFIRMED' %}
+    <p class="page-hint">下一步：如结论变化可修订；需要现场处理可转人工；满足安全限制后可关闭客服工单。</p>
+    {% endif %}
     {% if ticket.safety_risk in ['YES', 'UNKNOWN'] or ticket.shutdown in ['YES', 'UNKNOWN'] %}
     <p class="alert alert-warning">
         该工单涉及安全风险、停机或关键信息未确认，请先转人工核对；平台仅提供分诊辅助，不替代现场维修诊断。
@@ -88,6 +97,57 @@
     </form>
     {% endif %}
 
+    {% if ticket.action_status == 'NEED_INFO' %}
+    <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="action_type" value="SUPPLEMENT">
+        <h3 class="subsection-title">录入客户补充信息并重新分诊</h3>
+        <p class="page-hint">只填写客户新补充或确认的字段；原始报修内容不会被覆盖。</p>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="supplement_by">操作人 <span class="required">*</span></label>
+                <input id="supplement_by" name="action_by" required placeholder="如：客服001">
+            </div>
+            <div class="form-field">
+                <label for="supplement_model">设备型号</label>
+                <input id="supplement_model" name="equipment_model" placeholder="客户补充的型号">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="supplement_code">设备编号</label>
+                <input id="supplement_code" name="equipment_code" placeholder="客户补充的设备编号">
+            </div>
+            <div class="form-field">
+                <label for="supplement_operating">发生时运行状态</label>
+                <select id="supplement_operating" name="operating_state">
+                    <option value="">未补充</option><option value="STARTING">启动中</option><option value="RUNNING">运行中</option><option value="STANDBY">待机</option><option value="STOPPED">停机</option><option value="UNKNOWN">未知</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="supplement_shutdown">设备是否停机</label>
+                <select id="supplement_shutdown" name="shutdown"><option value="">未补充</option><option value="YES">是</option><option value="NO">否</option><option value="UNKNOWN">未知</option></select>
+            </div>
+            <div class="form-field">
+                <label for="supplement_safety">是否存在安全风险</label>
+                <select id="supplement_safety" name="safety_risk"><option value="">未补充</option><option value="YES">是</option><option value="NO">否</option><option value="UNKNOWN">未知</option></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="supplement_alarm_status">报警代码状态</label>
+                <select id="supplement_alarm_status" name="alarm_code_status"><option value="">未补充</option><option value="PRESENT">有报警代码</option><option value="NONE">无报警</option><option value="UNKNOWN">不清楚</option></select>
+            </div>
+            <div class="form-field">
+                <label for="supplement_alarm">报警代码</label>
+                <input id="supplement_alarm" name="alarm_code" placeholder="如：E104">
+            </div>
+        </div>
+        <div class="form-actions"><button type="submit" class="btn btn-primary">保存补充信息并重新分诊</button></div>
+    </form>
+    {% endif %}
+
     {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="action_type" value="CONFIRM">
@@ -117,8 +177,8 @@
                 </select>
             </div>
             <div class="form-field">
-                <label for="confirm_note">确认说明</label>
-                <textarea id="confirm_note" name="action_note" rows="3" placeholder="若确认结果与系统建议不一致，必须填写原因"></textarea>
+                <label for="confirm_note">人工核对或确认说明 {% if action_note_required %}<span class="required">*</span>{% endif %}</label>
+                <textarea id="confirm_note" name="action_note" rows="3" {% if action_note_required %}required{% endif %} placeholder="人工复核或风险工单必须填写核对说明；与系统建议不一致时也必须填写原因"></textarea>
             </div>
         </div>
         <div class="form-actions">
@@ -197,7 +257,7 @@
             <td>{{ display.action.get(action.action_type, action.action_type) }}</td>
             <td>{{ action.action_by }}</td>
             <td>{{ display.action_status.get(action.state_before, action.state_before) }} → {{ display.action_status.get(action.state_after, action.state_after) }}</td>
-            <td>{{ action.action_note or (action.new_values.get('customer_follow_up') if action.action_type == 'FOLLOW_UP' else '-') }}</td>
+            <td>{{ action_details.get(action.id, '-') }}</td>
         </tr>
         {% endfor %}
     </table>

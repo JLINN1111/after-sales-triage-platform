@@ -104,6 +104,19 @@ class TicketActionTests(unittest.TestCase):
             self.assertEqual(saved.customer_follow_up, "请补充设备型号和报警代码。")
             self.assertEqual(TicketAction.query.one().action_type, "FOLLOW_UP")
 
+    def test_human_review_confirmation_requires_note(self):
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            ticket.action_status = "HUMAN_REVIEW"
+            ticket.safety_risk = "YES"
+            ticket.priority = "URGENT"
+            db.session.commit()
+            with self.assertRaisesRegex(ValueError, "必须填写核对说明"):
+                apply_ticket_action(self.get_ticket(), {
+                    "action_type": "CONFIRM", "action_by": "客服001",
+                    "confirmed_category": "THERMAL_COOLING", "confirmed_priority": "URGENT",
+                })
+
     def test_risky_ticket_requires_handoff_before_close(self):
         with self.app.app_context():
             ticket = self.get_ticket()
@@ -184,6 +197,45 @@ class TicketActionTests(unittest.TestCase):
             saved = self.get_ticket()
             self.assertEqual(saved.action_status, "NEED_INFO")
             self.assertEqual(saved.customer_follow_up, "请补充设备型号和报警代码。")
+
+    def test_supplement_retriages_without_overwriting_original_ticket(self):
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            ticket.equipment_model = None
+            ticket.operating_state = "UNKNOWN"
+            ticket.shutdown = "UNKNOWN"
+            ticket.safety_risk = "UNKNOWN"
+            ticket.alarm_code_status = "UNKNOWN"
+            ticket.alarm_code = None
+            ticket.action_status = "NEED_INFO"
+            db.session.commit()
+        response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "SUPPLEMENT", "action_by": "客服001",
+            "equipment_model": "VF-2", "operating_state": "RUNNING",
+            "shutdown": "NO", "safety_risk": "NO",
+            "alarm_code_status": "PRESENT", "alarm_code": "253",
+        })
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            saved = self.get_ticket()
+            self.assertIsNone(saved.equipment_model)
+            self.assertEqual(saved.operating_state, "UNKNOWN")
+            action = TicketAction.query.one()
+            self.assertEqual(action.action_type, "SUPPLEMENT")
+            self.assertEqual(action.new_values["supplemental_fields"]["equipment_model"], "VF-2")
+            self.assertEqual(saved.action_status, "HUMAN_REVIEW")
+
+    def test_supplement_history_displays_customer_values(self):
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            ticket.action_status = "NEED_INFO"
+            db.session.commit()
+        self.app.test_client().post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "SUPPLEMENT", "action_by": "客服001", "shutdown": "NO",
+        })
+        response = self.app.test_client().get("/tickets/T-ACTION-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("是否停机：否".encode("utf-8"), response.data)
 
     def test_action_success_message_is_shown_on_detail_page(self):
         response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={

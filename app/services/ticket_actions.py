@@ -11,12 +11,19 @@ from app.models import Ticket, TicketAction
 
 
 STATES = {"NEW", "NEED_INFO", "HUMAN_REVIEW", "CONFIRMED", "CLOSED"}
-ACTIONS = {"FOLLOW_UP", "HANDOFF", "CONFIRM", "EDIT", "CLOSE"}
+ACTIONS = {"FOLLOW_UP", "SUPPLEMENT", "HANDOFF", "CONFIRM", "EDIT", "CLOSE"}
 CATEGORIES = {
     "ELECTRICAL_CONTROL", "MECHANICAL", "THERMAL_COOLING",
     "SENSOR_COMMUNICATION", "OTHER_UNKNOWN",
 }
 PRIORITIES = {"NORMAL", "HIGH", "URGENT"}
+TRI_STATES = {"YES", "NO", "UNKNOWN"}
+OPERATING_STATES = {"STARTING", "RUNNING", "STANDBY", "STOPPED", "UNKNOWN"}
+ALARM_STATUSES = {"PRESENT", "NONE", "UNKNOWN"}
+SUPPLEMENT_FIELDS = (
+    "equipment_model", "equipment_code", "operating_state", "shutdown",
+    "safety_risk", "alarm_code_status", "alarm_code",
+)
 
 
 def initial_action_status(triage_result: Mapping[str, Any]) -> str:
@@ -61,6 +68,25 @@ def _confirmation_values(ticket: Ticket, data: Mapping[str, Any], *, require_bot
     }
 
 
+def _supplemental_values(ticket: Ticket, data: Mapping[str, Any]) -> dict[str, str]:
+    values = {field: _text(data, field) for field in SUPPLEMENT_FIELDS}
+    if not any(values.values()):
+        raise ValueError("至少需要录入一项客户补充信息。")
+    if values["operating_state"] and values["operating_state"] not in OPERATING_STATES:
+        raise ValueError("运行状态取值无效。")
+    if values["shutdown"] and values["shutdown"] not in TRI_STATES:
+        raise ValueError("停机状态取值无效。")
+    if values["safety_risk"] and values["safety_risk"] not in TRI_STATES:
+        raise ValueError("安全风险取值无效。")
+    if values["alarm_code_status"] and values["alarm_code_status"] not in ALARM_STATUSES:
+        raise ValueError("报警代码状态取值无效。")
+    effective_alarm_status = values["alarm_code_status"] or ticket.alarm_code_status
+    effective_alarm_code = values["alarm_code"] or ticket.alarm_code
+    if effective_alarm_status == "PRESENT" and not effective_alarm_code:
+        raise ValueError("报警代码状态为“有代码”时，必须补充报警代码。")
+    return {field: value for field, value in values.items() if value}
+
+
 def needs_handoff_before_close(ticket: Ticket) -> bool:
     return ticket.safety_risk in {"YES", "UNKNOWN"} or ticket.shutdown in {"YES", "UNKNOWN"}
 
@@ -90,6 +116,10 @@ def apply_ticket_action(ticket: Ticket, data: Mapping[str, Any]) -> TicketAction
         _require_status(ticket, {"NEW", "NEED_INFO", "HUMAN_REVIEW", "CONFIRMED"}, "转人工")
         _require(data, "action_note", "转人工时必须填写原因。")
         after = "HUMAN_REVIEW"
+    elif action_type == "SUPPLEMENT":
+        _require_status(ticket, {"NEED_INFO"}, "录入补充信息")
+        new_values["supplemental_fields"] = _supplemental_values(ticket, data)
+        after = "NEED_INFO"
     elif action_type == "CONFIRM":
         _require_status(ticket, {"NEW", "NEED_INFO", "HUMAN_REVIEW"}, "确认")
         new_values.update(_confirmation_values(ticket, data, require_both=True))
@@ -99,6 +129,8 @@ def apply_ticket_action(ticket: Ticket, data: Mapping[str, Any]) -> TicketAction
         )
         if differs and not note:
             raise ValueError("确认结果与系统建议不一致时必须填写原因。")
+        if (ticket.action_status == "HUMAN_REVIEW" or needs_handoff_before_close(ticket)) and not note:
+            raise ValueError("人工复核或风险工单确认时必须填写核对说明。")
         after = "CONFIRMED"
     elif action_type == "EDIT":
         _require_status(ticket, {"CONFIRMED"}, "修订")
