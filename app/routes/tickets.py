@@ -210,6 +210,16 @@ def list_tickets():
     return render_template("tickets/list.html", tickets=tickets)
 
 
+@tickets_bp.route("/tickets/<ticket_id>/delete", methods=["POST"])
+def delete_ticket(ticket_id):
+    """删除一张工单；仅接受 POST，避免误操作与搜索引擎抓取触发。"""
+    ticket = Ticket.query.get_or_404(ticket_id)
+    db.session.delete(ticket)
+    db.session.commit()
+    flash(f"工单 {ticket_id} 已删除。")
+    return redirect(url_for("tickets.list_tickets"))
+
+
 @tickets_bp.route("/tickets/<ticket_id>")
 def ticket_detail(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
