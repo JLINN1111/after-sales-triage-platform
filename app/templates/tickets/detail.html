@@ -84,6 +84,43 @@
         </div>
     </form>
 
+    <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="action_type" value="CONFIRM">
+        <div class="form-row">
+            <div class="form-field">
+                <label for="confirm_by">操作人 <span class="required">*</span></label>
+                <input id="confirm_by" name="action_by" required placeholder="如：客服001">
+            </div>
+            <div class="form-field">
+                <label for="confirmed_category">确认故障类别 <span class="required">*</span></label>
+                <select id="confirmed_category" name="confirmed_category" required>
+                    <option value="">请选择</option>
+                    {% for code, name in display.category.items() %}
+                    <option value="{{ code }}" {% if code == (ticket.confirmed_category or ticket.predicted_category) %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="confirmed_priority">确认优先级 <span class="required">*</span></label>
+                <select id="confirmed_priority" name="confirmed_priority" required>
+                    <option value="">请选择</option>
+                    {% for code, name in display.priority.items() %}
+                    <option value="{{ code }}" {% if code == (ticket.confirmed_priority or ticket.priority) %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="confirm_note">确认说明</label>
+                <textarea id="confirm_note" name="action_note" rows="3" placeholder="若确认结果与系统建议不一致，必须填写原因"></textarea>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">确认分诊结果</button>
+        </div>
+    </form>
+
     <h3 class="subsection-title">操作历史</h3>
     {% if ticket.actions %}
     <table class="detail-table">

@@ -168,6 +168,18 @@ class TicketActionTests(unittest.TestCase):
             self.assertEqual(saved.action_status, "NEED_INFO")
             self.assertEqual(saved.customer_follow_up, "请补充设备型号和报警代码。")
 
+    def test_form_confirm_redirects_and_saves_confirmation(self):
+        response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "CONFIRM", "action_by": "客服001",
+            "confirmed_category": "THERMAL_COOLING", "confirmed_priority": "NORMAL",
+        })
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            saved = self.get_ticket()
+            self.assertEqual(saved.action_status, "CONFIRMED")
+            self.assertEqual(saved.confirmed_category, "THERMAL_COOLING")
+            self.assertEqual(saved.confirmed_priority, "NORMAL")
+
 
 if __name__ == "__main__":
     unittest.main()
