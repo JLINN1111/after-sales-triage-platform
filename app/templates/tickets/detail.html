@@ -11,28 +11,63 @@
     <h2 class="section-title">基本信息</h2>
     <table class="detail-table">
         <tr><th>工单编号</th><td>{{ ticket.ticket_id }}</td></tr>
-        <tr><th>设备类型</th><td>{{ ticket.equipment_type }}</td></tr>
-        <tr><th>设备型号</th><td>{{ ticket.equipment_model }}</td></tr>
+        <tr><th>设备类型</th><td>{{ display.equipment.get(ticket.equipment_type, ticket.equipment_type) }}</td></tr>
+        <tr><th>设备型号</th><td>{{ ticket.equipment_model or '未填写（已列入补问）' }}</td></tr>
         <tr><th>设备编号</th><td>{{ ticket.equipment_code or '-' }}</td></tr>
         <tr><th>故障现象描述</th><td>{{ ticket.description }}</td></tr>
         <tr><th>故障发生时间</th><td>{{ ticket.occurred_at or '-' }}</td></tr>
-        <tr><th>运行时状态</th><td>{{ ticket.operating_state }}</td></tr>
-        <tr><th>是否停机</th><td>{{ ticket.shutdown }}</td></tr>
-        <tr><th>安全风险</th><td>{{ ticket.safety_risk }}</td></tr>
-        <tr><th>报警代码状态</th><td>{{ ticket.alarm_code_status }}</td></tr>
+        <tr><th>运行时状态</th><td>{{ display.operating.get(ticket.operating_state, ticket.operating_state) }}</td></tr>
+        <tr><th>是否停机</th><td>{{ display.tri.get(ticket.shutdown, ticket.shutdown) }}</td></tr>
+        <tr><th>安全风险</th><td>{{ display.tri.get(ticket.safety_risk, ticket.safety_risk) }}</td></tr>
+        <tr><th>报警代码状态</th><td>{{ display.alarm_status.get(ticket.alarm_code_status, ticket.alarm_code_status) }}</td></tr>
         <tr><th>报警代码</th><td>{{ ticket.alarm_code or '-' }}</td></tr>
         <tr><th>补充说明</th><td>{{ ticket.submitter_note or '-' }}</td></tr>
         <tr><th>处理状态</th><td><span class="status-badge">{{ ticket.action_status }}</span></td></tr>
-        <tr><th>创建时间</th><td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') if ticket.created_at else '-' }}</td></tr>
+        <tr><th>提交时间</th><td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') if ticket.created_at else '-' }}</td></tr>
     </table>
 
-    <h2 class="section-title">分诊结果</h2>
+    <h2 class="section-title">分诊建议</h2>
+    {% if match_pending %}
+    <p class="page-hint">该工单尚未完成分诊，以下结果将在系统处理后显示。</p>
+    {% else %}
     <table class="detail-table">
-        <tr><th>预测类别</th><td>{{ ticket.predicted_category or '待分诊' }}</td></tr>
-        <tr><th>优先级</th><td>{{ ticket.priority or '待分诊' }}</td></tr>
-        <tr><th>判断依据</th><td>{{ ticket.evidence_codes or '-' }}</td></tr>
+        <tr><th>故障类别</th><td>{{ category_zh }}</td></tr>
+        <tr><th>建议优先级</th><td>{{ priority_zh }}</td></tr>
+        <tr><th>判断依据</th><td>{{ evidence_zh | join('；') if evidence_zh else '-' }}</td></tr>
+        <tr><th>建议补充信息</th><td>{{ (ticket.follow_up_questions or []) | join('；') if ticket.follow_up_questions else '无' }}</td></tr>
         <tr><th>建议转人工</th><td>{{ '是' if ticket.recommend_human else '否' }}</td></tr>
+        {% if handoff_zh %}
+        <tr><th>转人工原因</th><td>{{ handoff_zh | join('；') }}</td></tr>
+        {% endif %}
+        <tr><th>算法版本</th><td>{{ ticket.model_version or '-' }}</td></tr>
     </table>
-    <p class="page-hint">分诊结果由成员1的算法模块产生，第一阶段留空属正常。</p>
+    {% endif %}
+
+    <h2 class="section-title">维修知识参考</h2>
+    {% if match_pending %}
+    <p class="page-hint">知识检索尚未完成。</p>
+    {% elif match_zh %}
+    <p class="page-hint"><strong>{{ match_zh[0] }}</strong>：{{ match_zh[1] }}</p>
+    {% if exact_items %}
+    <table class="detail-table">
+        <tr><th>知识编号</th><th>资料名称</th><th>处置方向（原厂）</th><th>来源</th></tr>
+        {% for item in exact_items %}
+        <tr><td>{{ item.id }}</td><td>{{ item.title }}</td><td>{{ item.summary }}</td><td>{{ item.source }}</td></tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% if reference_items %}
+    <p class="page-hint">以下为同类设备参考条目，仅供核对，不能作为确定结论：</p>
+    <table class="detail-table">
+        <tr><th>知识编号</th><th>资料名称</th><th>处置方向（参考）</th><th>来源</th></tr>
+        {% for item in reference_items %}
+        <tr><td>{{ item.id }}</td><td>{{ item.title }}</td><td>{{ item.summary }}</td><td>{{ item.source }}</td></tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    {% if not exact_items and not reference_items %}
+    <p class="page-hint">请补充设备品牌、型号、控制系统、报警代码等信息，或转人工处理。</p>
+    {% endif %}
+    {% endif %}
 </div>
 {% endblock %}
