@@ -197,6 +197,32 @@ class TicketActionTests(unittest.TestCase):
             self.assertEqual(saved.confirmed_priority, "HIGH")
             self.assertEqual(TicketAction.query.count(), 2)
 
+    def test_form_close_redirects_after_confirmation(self):
+        client = self.app.test_client()
+        client.post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "CONFIRM", "action_by": "客服001",
+            "confirmed_category": "THERMAL_COOLING", "confirmed_priority": "NORMAL",
+        })
+        response = client.post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "CLOSE", "action_by": "客服001", "action_note": "客户已确认处理完成。",
+        })
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            saved = self.get_ticket()
+            self.assertEqual(saved.action_status, "CLOSED")
+            self.assertEqual(TicketAction.query.count(), 2)
+
+    def test_detail_hides_close_form_until_risky_ticket_is_handed_off(self):
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            ticket.safety_risk = "YES"
+            ticket.action_status = "CONFIRMED"
+            db.session.commit()
+        response = self.app.test_client().get("/tickets/T-ACTION-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("关闭前必须先记录“转人工处理”".encode("utf-8"), response.data)
+        self.assertNotIn(b'name="action_type" value="CLOSE"', response.data)
+
 
 if __name__ == "__main__":
     unittest.main()

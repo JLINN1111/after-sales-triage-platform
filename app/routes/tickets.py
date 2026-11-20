@@ -14,7 +14,7 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 from app import db
 from app.models import Ticket
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
-from app.services.ticket_actions import apply_ticket_action, initial_action_status
+from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
 from app.services.triage_service import triage_ticket
 
 tickets_bp = Blueprint("tickets", __name__)
@@ -260,6 +260,7 @@ def ticket_action(ticket_id):
 def ticket_detail(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     match_level = ticket.knowledge_match_level
+    has_handoff = any(action.action_type == "HANDOFF" for action in ticket.actions)
     return render_template(
         "tickets/detail.html",
         ticket=ticket,
@@ -272,4 +273,6 @@ def ticket_detail(ticket_id):
         reference_items=knowledge_details(ticket.reference_knowledge_ids),
         evidence_zh=translate_evidence(ticket.evidence_codes),
         handoff_zh=[DISPLAY["evidence"].get(r, r) for r in (ticket.handoff_reasons or [])],
+        close_requires_handoff=needs_handoff_before_close(ticket),
+        has_handoff=has_handoff,
     )

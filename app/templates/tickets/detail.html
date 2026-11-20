@@ -164,6 +164,29 @@
     </form>
     {% endif %}
 
+    {% if ticket.action_status == 'CONFIRMED' %}
+        {% if close_requires_handoff and not has_handoff %}
+        <p class="alert alert-warning">该工单涉及安全风险、停机或状态未知。关闭前必须先记录“转人工处理”，由人工核对后再确认关闭。</p>
+        {% else %}
+        <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+            <input type="hidden" name="action_type" value="CLOSE">
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="close_by">操作人 <span class="required">*</span></label>
+                    <input id="close_by" name="action_by" required placeholder="如：客服001">
+                </div>
+                <div class="form-field">
+                    <label for="close_note">关闭说明 <span class="required">*</span></label>
+                    <textarea id="close_note" name="action_note" required rows="3" placeholder="请说明工单关闭原因或处理结论"></textarea>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-secondary">关闭工单</button>
+            </div>
+        </form>
+        {% endif %}
+    {% endif %}
+
     <h3 class="subsection-title">操作历史</h3>
     {% if ticket.actions %}
     <table class="detail-table">

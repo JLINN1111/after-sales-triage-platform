@@ -61,7 +61,7 @@ def _confirmation_values(ticket: Ticket, data: Mapping[str, Any], *, require_bot
     }
 
 
-def _needs_handoff_before_close(ticket: Ticket) -> bool:
+def needs_handoff_before_close(ticket: Ticket) -> bool:
     return ticket.safety_risk in {"YES", "UNKNOWN"} or ticket.shutdown in {"YES", "UNKNOWN"}
 
 
@@ -110,7 +110,7 @@ def apply_ticket_action(ticket: Ticket, data: Mapping[str, Any]) -> TicketAction
     else:  # CLOSE
         _require_status(ticket, {"CONFIRMED"}, "关闭")
         _require(data, "action_note", "关闭工单时必须填写说明。")
-        if _needs_handoff_before_close(ticket) and not any(
+        if needs_handoff_before_close(ticket) and not any(
             action.action_type == "HANDOFF" for action in ticket.actions
         ):
             raise ValueError("安全、停机或状态未知工单关闭前必须先记录转人工处理。")
