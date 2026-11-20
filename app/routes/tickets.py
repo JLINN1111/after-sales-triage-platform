@@ -247,7 +247,7 @@ def new_ticket():
 @tickets_bp.route("/tickets")
 def list_tickets():
     tickets = Ticket.query.order_by(Ticket.created_at.desc()).all()
-    return render_template("tickets/list.html", tickets=tickets)
+    return render_template("tickets/list.html", tickets=tickets, display=DISPLAY)
 
 
 @tickets_bp.route("/tickets/<ticket_id>/delete", methods=["POST"])

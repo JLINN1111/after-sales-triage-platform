@@ -50,6 +50,19 @@ class TicketActionTests(unittest.TestCase):
         self.assertEqual(initial_action_status({"recommend_human": False, "missing_fields": ["equipment_model"]}), "NEED_INFO")
         self.assertEqual(initial_action_status({"recommend_human": False, "missing_fields": []}), "NEW")
 
+    def test_ticket_list_displays_chinese_action_status(self):
+        """列表页只展示中文状态，不暴露内部状态码。"""
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            ticket.action_status = "HUMAN_REVIEW"
+            db.session.commit()
+
+        response = self.app.test_client().get("/tickets")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("人工复核中".encode("utf-8"), response.data)
+        self.assertNotIn(b"HUMAN_REVIEW", response.data)
+
     def test_confirm_preserves_system_result_and_writes_history(self):
         with self.app.app_context():
             ticket = self.get_ticket()
