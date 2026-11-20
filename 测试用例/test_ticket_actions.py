@@ -180,6 +180,23 @@ class TicketActionTests(unittest.TestCase):
             self.assertEqual(saved.confirmed_category, "THERMAL_COOLING")
             self.assertEqual(saved.confirmed_priority, "NORMAL")
 
+    def test_form_edit_requires_confirmed_status_and_saves_change(self):
+        client = self.app.test_client()
+        client.post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "CONFIRM", "action_by": "客服001",
+            "confirmed_category": "THERMAL_COOLING", "confirmed_priority": "NORMAL",
+        })
+        response = client.post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "EDIT", "action_by": "客服001",
+            "confirmed_priority": "HIGH", "action_note": "补充现场影响范围后提高优先级。",
+        })
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            saved = self.get_ticket()
+            self.assertEqual(saved.action_status, "CONFIRMED")
+            self.assertEqual(saved.confirmed_priority, "HIGH")
+            self.assertEqual(TicketAction.query.count(), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -50,6 +50,7 @@
         该工单涉及安全风险、停机或关键信息未确认，请先转人工核对；平台仅提供分诊辅助，不替代现场维修诊断。
     </p>
     {% endif %}
+    {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW', 'CONFIRMED'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="action_type" value="HANDOFF">
         <div class="form-row">
@@ -66,7 +67,9 @@
             <button type="submit" class="btn btn-primary">转人工处理</button>
         </div>
     </form>
+    {% endif %}
 
+    {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="action_type" value="FOLLOW_UP">
         <div class="form-row">
@@ -83,7 +86,9 @@
             <button type="submit" class="btn btn-secondary">记录补问信息</button>
         </div>
     </form>
+    {% endif %}
 
+    {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="action_type" value="CONFIRM">
         <div class="form-row">
@@ -120,6 +125,44 @@
             <button type="submit" class="btn btn-primary">确认分诊结果</button>
         </div>
     </form>
+    {% endif %}
+
+    {% if ticket.action_status == 'CONFIRMED' %}
+    <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="action_type" value="EDIT">
+        <div class="form-row">
+            <div class="form-field">
+                <label for="edit_by">操作人 <span class="required">*</span></label>
+                <input id="edit_by" name="action_by" required placeholder="如：客服001">
+            </div>
+            <div class="form-field">
+                <label for="edit_note">修订原因 <span class="required">*</span></label>
+                <textarea id="edit_note" name="action_note" required rows="3" placeholder="请说明为何修订已确认的分诊结果"></textarea>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label for="edit_category">修订故障类别</label>
+                <select id="edit_category" name="confirmed_category">
+                    {% for code, name in display.category.items() %}
+                    <option value="{{ code }}" {% if code == (ticket.confirmed_category or ticket.predicted_category) %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-field">
+                <label for="edit_priority">修订优先级</label>
+                <select id="edit_priority" name="confirmed_priority">
+                    {% for code, name in display.priority.items() %}
+                    <option value="{{ code }}" {% if code == (ticket.confirmed_priority or ticket.priority) %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-secondary">修订确认结果</button>
+        </div>
+    </form>
+    {% endif %}
 
     <h3 class="subsection-title">操作历史</h3>
     {% if ticket.actions %}
