@@ -9,11 +9,12 @@
 
 from datetime import datetime
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 
 from app import db
 from app.models import Ticket
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
+from app.services.ticket_actions import apply_ticket_action, initial_action_status
 from app.services.triage_service import triage_ticket
 
 tickets_bp = Blueprint("tickets", __name__)
@@ -113,6 +114,7 @@ def apply_triage(ticket):
         if field == "triaged_at" and value:
             value = datetime.fromisoformat(value)
         setattr(ticket, field, value)
+    ticket.action_status = initial_action_status(result)
     return result
 
 TRI_STATE = {"YES", "NO", "UNKNOWN"}
@@ -218,6 +220,32 @@ def delete_ticket(ticket_id):
     db.session.commit()
     flash(f"工单 {ticket_id} 已删除。")
     return redirect(url_for("tickets.list_tickets"))
+
+
+@tickets_bp.route("/tickets/<ticket_id>/actions", methods=["POST"])
+def ticket_action(ticket_id):
+    """接收客服补问、转人工、确认、修订或关闭操作并保存留痕。"""
+    ticket = Ticket.query.get_or_404(ticket_id)
+    payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+    try:
+        action = apply_ticket_action(ticket, payload or {})
+    except ValueError as error:
+        if request.is_json:
+            return jsonify({"error": str(error)}), 400
+        flash(str(error))
+        return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
+
+    db.session.add(action)
+    db.session.commit()
+    if request.is_json:
+        return jsonify({
+            "ticket_id": ticket.ticket_id,
+            "action_type": action.action_type,
+            "action_status": ticket.action_status,
+            "action_id": action.id,
+        }), 200
+    flash("客服操作已保存。")
+    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
 
 
 @tickets_bp.route("/tickets/<ticket_id>")

@@ -45,3 +45,29 @@ class Ticket(db.Model):
     action_note = db.Column(db.Text)
     action_at = db.Column(db.DateTime)
     action_by = db.Column(db.String(32))
+
+    actions = db.relationship(
+        "TicketAction",
+        back_populates="ticket",
+        cascade="all, delete-orphan",
+        order_by="TicketAction.action_at",
+    )
+
+
+class TicketAction(db.Model):
+    """客服对工单的单次操作留痕，不覆盖系统原始分诊结果。"""
+
+    __tablename__ = "ticket_actions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(db.String(32), db.ForeignKey("tickets.ticket_id"), nullable=False, index=True)
+    action_type = db.Column(db.String(16), nullable=False)
+    state_before = db.Column(db.String(16), nullable=False)
+    state_after = db.Column(db.String(16), nullable=False)
+    old_values = db.Column(db.JSON, nullable=False, default=dict)
+    new_values = db.Column(db.JSON, nullable=False, default=dict)
+    action_note = db.Column(db.Text)
+    action_by = db.Column(db.String(32), nullable=False)
+    action_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+    ticket = db.relationship("Ticket", back_populates="actions")
