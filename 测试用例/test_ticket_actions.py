@@ -131,6 +131,19 @@ class TicketActionTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("当前状态不允许", response.get_json()["error"])
 
+    def test_detail_displays_action_history(self):
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            db.session.add(apply_ticket_action(ticket, {
+                "action_type": "HANDOFF", "action_by": "客服001", "action_note": "停机状态需要现场核对。",
+            }))
+            db.session.commit()
+        response = self.app.test_client().get("/tickets/T-ACTION-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("操作历史".encode("utf-8"), response.data)
+        self.assertIn("转人工处理".encode("utf-8"), response.data)
+        self.assertIn("客服001".encode("utf-8"), response.data)
+
 
 if __name__ == "__main__":
     unittest.main()

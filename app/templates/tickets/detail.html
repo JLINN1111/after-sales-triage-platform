@@ -44,7 +44,7 @@
     {% endif %}
 
     <h2 class="section-title">客服处理</h2>
-    <p class="page-hint">当前处理状态：<span class="status-badge">{{ ticket.action_status }}</span></p>
+    <p class="page-hint">当前处理状态：<span class="status-badge">{{ display.action_status.get(ticket.action_status, ticket.action_status) }}</span></p>
     {% if ticket.safety_risk in ['YES', 'UNKNOWN'] or ticket.shutdown in ['YES', 'UNKNOWN'] %}
     <p class="alert alert-warning">
         该工单涉及安全风险、停机或关键信息未确认，请先转人工核对；平台仅提供分诊辅助，不替代现场维修诊断。
@@ -66,6 +66,24 @@
             <button type="submit" class="btn btn-primary">转人工处理</button>
         </div>
     </form>
+
+    <h3 class="subsection-title">操作历史</h3>
+    {% if ticket.actions %}
+    <table class="detail-table">
+        <tr><th>操作时间</th><th>操作类型</th><th>操作人</th><th>状态变化</th><th>处理说明</th></tr>
+        {% for action in ticket.actions %}
+        <tr>
+            <td>{{ action.action_at.strftime('%Y-%m-%d %H:%M:%S') if action.action_at else '-' }}</td>
+            <td>{{ display.action.get(action.action_type, action.action_type) }}</td>
+            <td>{{ action.action_by }}</td>
+            <td>{{ display.action_status.get(action.state_before, action.state_before) }} → {{ display.action_status.get(action.state_after, action.state_after) }}</td>
+            <td>{{ action.action_note or '-' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="page-hint">暂未记录客服操作。</p>
+    {% endif %}
 
     <h2 class="section-title">维修知识参考</h2>
     {% if match_pending %}

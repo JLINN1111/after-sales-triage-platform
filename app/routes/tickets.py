@@ -44,6 +44,14 @@ DISPLAY = {
         "STOPPED": "停机", "UNKNOWN": "未知",
     },
     "alarm_status": {"PRESENT": "有报警代码", "NONE": "无报警", "UNKNOWN": "不清楚"},
+    "action": {
+        "FOLLOW_UP": "补问信息", "HANDOFF": "转人工处理", "CONFIRM": "确认分诊",
+        "EDIT": "修订确认结果", "CLOSE": "关闭工单",
+    },
+    "action_status": {
+        "NEW": "待处理", "NEED_INFO": "待补充信息", "HUMAN_REVIEW": "人工复核中",
+        "CONFIRMED": "已确认", "CLOSED": "已关闭",
+    },
     "category_code": {
         "ELECTRICAL_CONTROL": "电气或控制异常", "MECHANICAL": "机械或传动异常",
         "THERMAL_COOLING": "温度或冷却异常", "SENSOR_COMMUNICATION": "传感或通信异常",
