@@ -197,7 +197,7 @@
             <td>{{ display.action.get(action.action_type, action.action_type) }}</td>
             <td>{{ action.action_by }}</td>
             <td>{{ display.action_status.get(action.state_before, action.state_before) }} → {{ display.action_status.get(action.state_after, action.state_after) }}</td>
-            <td>{{ action.action_note or action.new_values.get('customer_follow_up') or '-' }}</td>
+            <td>{{ action.action_note or (action.new_values.get('customer_follow_up') if action.action_type == 'FOLLOW_UP' else '-') }}</td>
         </tr>
         {% endfor %}
     </table>

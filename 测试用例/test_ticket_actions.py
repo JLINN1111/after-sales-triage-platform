@@ -157,6 +157,23 @@ class TicketActionTests(unittest.TestCase):
         self.assertIn("转人工处理".encode("utf-8"), response.data)
         self.assertIn("客服001".encode("utf-8"), response.data)
 
+    def test_history_does_not_repeat_follow_up_content_for_confirmation(self):
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            db.session.add(apply_ticket_action(ticket, {
+                "action_type": "FOLLOW_UP", "action_by": "客服001",
+                "customer_follow_up": "请补充现场照片。",
+            }))
+            db.session.commit()
+            db.session.add(apply_ticket_action(self.get_ticket(), {
+                "action_type": "CONFIRM", "action_by": "客服001",
+                "confirmed_category": "THERMAL_COOLING", "confirmed_priority": "NORMAL",
+            }))
+            db.session.commit()
+        response = self.app.test_client().get("/tickets/T-ACTION-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.count("请补充现场照片。".encode("utf-8")), 1)
+
     def test_form_follow_up_redirects_and_saves_history(self):
         response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={
             "action_type": "FOLLOW_UP", "action_by": "客服001",
@@ -167,6 +184,13 @@ class TicketActionTests(unittest.TestCase):
             saved = self.get_ticket()
             self.assertEqual(saved.action_status, "NEED_INFO")
             self.assertEqual(saved.customer_follow_up, "请补充设备型号和报警代码。")
+
+    def test_action_success_message_is_shown_on_detail_page(self):
+        response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "HANDOFF", "action_by": "客服001", "action_note": "需要人工核对。",
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("客服操作已保存。".encode("utf-8"), response.data)
 
     def test_form_confirm_redirects_and_saves_confirmation(self):
         response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={

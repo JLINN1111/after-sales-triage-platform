@@ -8,12 +8,6 @@
         <a href="{{ url_for('tickets.new_ticket') }}" class="btn btn-primary">+ 提交报修</a>
     </div>
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}<div class="alert alert-success">{{ msg }}</div>{% endfor %}
-        {% endif %}
-    {% endwith %}
-
     {% if tickets %}
     <table class="ticket-table">
         <thead>
