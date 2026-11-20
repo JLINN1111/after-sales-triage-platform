@@ -34,6 +34,7 @@ a:hover { text-decoration: underline; }
 .alert { padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; }
 .alert-error { background: #fdecea; color: #a5281b; border: 1px solid #f5c6c0; }
 .alert-success { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+.alert-warning { background: #fff7e6; color: #8a5a00; border: 1px solid #f3d19c; }
 .alert ul { margin: 6px 0 0; }
 
 .ticket-table, .detail-table { width: 100%; border-collapse: collapse; }
@@ -50,3 +51,4 @@ a:hover { text-decoration: underline; }
     color: #c0392b; font-size: 14px; font-family: inherit;
 }
 .btn-delete:hover { text-decoration: underline; color: #96281b; }
+.action-form { margin-bottom: 18px; }

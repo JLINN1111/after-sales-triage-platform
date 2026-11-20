@@ -43,6 +43,30 @@
     </table>
     {% endif %}
 
+    <h2 class="section-title">客服处理</h2>
+    <p class="page-hint">当前处理状态：<span class="status-badge">{{ ticket.action_status }}</span></p>
+    {% if ticket.safety_risk in ['YES', 'UNKNOWN'] or ticket.shutdown in ['YES', 'UNKNOWN'] %}
+    <p class="alert alert-warning">
+        该工单涉及安全风险、停机或关键信息未确认，请先转人工核对；平台仅提供分诊辅助，不替代现场维修诊断。
+    </p>
+    {% endif %}
+    <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="action_type" value="HANDOFF">
+        <div class="form-row">
+            <div class="form-field">
+                <label for="action_by">操作人 <span class="required">*</span></label>
+                <input id="action_by" name="action_by" required placeholder="如：客服001">
+            </div>
+            <div class="form-field">
+                <label for="action_note">转人工原因 <span class="required">*</span></label>
+                <textarea id="action_note" name="action_note" required rows="3" placeholder="请填写需要人工核对的原因"></textarea>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">转人工处理</button>
+        </div>
+    </form>
+
     <h2 class="section-title">维修知识参考</h2>
     {% if match_pending %}
     <p class="page-hint">知识检索尚未完成。</p>
