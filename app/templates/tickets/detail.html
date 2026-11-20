@@ -67,6 +67,23 @@
         </div>
     </form>
 
+    <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="action_type" value="FOLLOW_UP">
+        <div class="form-row">
+            <div class="form-field">
+                <label for="follow_up_by">操作人 <span class="required">*</span></label>
+                <input id="follow_up_by" name="action_by" required placeholder="如：客服001">
+            </div>
+            <div class="form-field">
+                <label for="customer_follow_up">补问内容 <span class="required">*</span></label>
+                <textarea id="customer_follow_up" name="customer_follow_up" required rows="3" placeholder="如：请补充设备型号、当前报警代码和现场照片"></textarea>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-secondary">记录补问信息</button>
+        </div>
+    </form>
+
     <h3 class="subsection-title">操作历史</h3>
     {% if ticket.actions %}
     <table class="detail-table">
@@ -77,7 +94,7 @@
             <td>{{ display.action.get(action.action_type, action.action_type) }}</td>
             <td>{{ action.action_by }}</td>
             <td>{{ display.action_status.get(action.state_before, action.state_before) }} → {{ display.action_status.get(action.state_after, action.state_after) }}</td>
-            <td>{{ action.action_note or '-' }}</td>
+            <td>{{ action.action_note or action.new_values.get('customer_follow_up') or '-' }}</td>
         </tr>
         {% endfor %}
     </table>

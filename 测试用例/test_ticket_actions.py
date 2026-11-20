@@ -91,6 +91,19 @@ class TicketActionTests(unittest.TestCase):
             self.assertEqual(saved.confirmed_priority, "HIGH")
             self.assertEqual(TicketAction.query.count(), 2)
 
+    def test_follow_up_writes_question_and_sets_need_info(self):
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            db.session.add(apply_ticket_action(ticket, {
+                "action_type": "FOLLOW_UP", "action_by": "客服001",
+                "customer_follow_up": "请补充设备型号和报警代码。",
+            }))
+            db.session.commit()
+            saved = self.get_ticket()
+            self.assertEqual(saved.action_status, "NEED_INFO")
+            self.assertEqual(saved.customer_follow_up, "请补充设备型号和报警代码。")
+            self.assertEqual(TicketAction.query.one().action_type, "FOLLOW_UP")
+
     def test_risky_ticket_requires_handoff_before_close(self):
         with self.app.app_context():
             ticket = self.get_ticket()
@@ -143,6 +156,17 @@ class TicketActionTests(unittest.TestCase):
         self.assertIn("操作历史".encode("utf-8"), response.data)
         self.assertIn("转人工处理".encode("utf-8"), response.data)
         self.assertIn("客服001".encode("utf-8"), response.data)
+
+    def test_form_follow_up_redirects_and_saves_history(self):
+        response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={
+            "action_type": "FOLLOW_UP", "action_by": "客服001",
+            "customer_follow_up": "请补充设备型号和报警代码。",
+        })
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            saved = self.get_ticket()
+            self.assertEqual(saved.action_status, "NEED_INFO")
+            self.assertEqual(saved.customer_follow_up, "请补充设备型号和报警代码。")
 
 
 if __name__ == "__main__":
