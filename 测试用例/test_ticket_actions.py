@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+import re
 from pathlib import Path
 from unittest.mock import patch
 
@@ -19,6 +20,7 @@ class TicketActionTests(unittest.TestCase):
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database}",
             "LLM_ENABLED": False,
             "LLM_ALLOW_EXTERNAL_CALLS": False,
+            "CSRF_ENABLED": False,
         })
         with self.app.app_context():
             db.create_all()
@@ -388,6 +390,51 @@ class TicketActionTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("关闭前必须先记录“转人工处理”".encode("utf-8"), response.data)
         self.assertNotIn(b'name="action_type" value="CLOSE"', response.data)
+
+class CsrfProtectionTests(unittest.TestCase):
+    def setUp(self):
+        self.tempdir = tempfile.TemporaryDirectory()
+        database = Path(self.tempdir.name) / "csrf.db"
+        self.app = create_app({
+            "TESTING": True,
+            "SECRET_KEY": "csrf-test-secret",
+            "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database}",
+            "CSRF_ENABLED": True,
+        })
+        with self.app.app_context():
+            db.create_all()
+
+    def tearDown(self):
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
+            db.engine.dispose()
+        self.tempdir.cleanup()
+
+    def test_rejects_post_without_csrf_token(self):
+        response = self.app.test_client().post("/tickets/new", data={})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("请求校验失败".encode("utf-8"), response.data)
+
+    def test_accepts_form_post_with_token_from_page(self):
+        client = self.app.test_client()
+        page = client.get("/tickets/new")
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        response = client.post("/tickets/new", data={
+            "csrf_token": token,
+            "equipment_type": "CNC",
+            "equipment_model": "VF-2",
+            "equipment_code": "CSRF-001",
+            "description": "控制柜温度过高，冷却风扇异常。",
+            "occurred_at": "",
+            "operating_state": "RUNNING",
+            "shutdown": "NO",
+            "safety_risk": "NO",
+            "alarm_code_status": "PRESENT",
+            "alarm_code": "253",
+            "submitter_note": "",
+        })
+        self.assertEqual(response.status_code, 302)
 
 
 if __name__ == "__main__":

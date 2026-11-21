@@ -66,7 +66,8 @@
             result.hidden = false;
             result.replaceChildren();
             try {
-                const response = await fetch(button.dataset.url, {method: "POST", headers: {"Accept": "application/json"}});
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+                const response = await fetch(button.dataset.url, {method: "POST", headers: {"Accept": "application/json", "X-CSRF-Token": csrfToken}});
                 const data = await response.json();
                 if (data.status !== "REFERENCE" || !data.reference) {
                     const message = (data.reasons && data.reasons[0]) || "未获得参考，请按人工流程处理。";
@@ -112,6 +113,7 @@
     {% endif %}
     {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW', 'CONFIRMED'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="HANDOFF">
         <div class="form-row">
             <div class="form-field">
@@ -131,6 +133,7 @@
 
     {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="FOLLOW_UP">
         <div class="form-row">
             <div class="form-field">
@@ -150,6 +153,7 @@
 
     {% if ticket.action_status == 'NEED_INFO' %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="SUPPLEMENT">
         <h3 class="subsection-title">录入客户补充信息并重新分诊</h3>
         <p class="page-hint">只填写客户新补充或确认的字段；原始报修内容不会被覆盖。</p>
@@ -201,6 +205,7 @@
 
     {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="CONFIRM">
         <div class="form-row">
             <div class="form-field">
@@ -240,6 +245,7 @@
 
     {% if ticket.action_status == 'CONFIRMED' %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="EDIT">
         <div class="form-row">
             <div class="form-field">
@@ -280,6 +286,7 @@
         <p class="alert alert-warning">该工单涉及安全风险、停机或状态未知。关闭前必须先记录“转人工处理”，由人工核对后再确认关闭。</p>
         {% else %}
         <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="action_type" value="CLOSE">
             <div class="form-row">
                 <div class="form-field">

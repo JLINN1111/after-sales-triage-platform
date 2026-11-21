@@ -11,6 +11,7 @@ load_dotenv(ROOT / ".env")
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "local-development-only")
+    CSRF_ENABLED = os.getenv("CSRF_ENABLED", "true").lower() == "true"
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL", f"sqlite:///{ROOT / '本地运行数据' / 'triage.db'}"
     )

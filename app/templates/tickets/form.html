@@ -16,6 +16,7 @@
     {% endif %}
 
     <form method="post" action="{{ url_for('tickets.new_ticket') }}" class="ticket-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-row">
             <div class="form-field">
                 <label for="equipment_type">设备类型 <span class="required">*</span></label>
