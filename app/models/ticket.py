@@ -52,6 +52,7 @@ class Ticket(db.Model):
         cascade="all, delete-orphan",
         order_by="TicketAction.action_at",
     )
+    outcomes = db.relationship("TicketOutcome", back_populates="ticket", cascade="all, delete-orphan", order_by="TicketOutcome.recorded_at")
 
 
 class TicketAction(db.Model):
@@ -71,3 +72,19 @@ class TicketAction(db.Model):
     action_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     ticket = db.relationship("Ticket", back_populates="actions")
+
+
+class TicketOutcome(db.Model):
+    """复核主管记录的处理结果；仅作待审核数据来源，不自动训练模型。"""
+
+    __tablename__ = "ticket_outcomes"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(db.String(32), db.ForeignKey("tickets.ticket_id"), nullable=False, index=True)
+    final_category = db.Column(db.String(32), nullable=False)
+    resolution_status = db.Column(db.String(24), nullable=False)
+    resolution_note = db.Column(db.Text, nullable=False)
+    recorded_by = db.Column(db.String(64), nullable=False)
+    recorded_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+    ticket = db.relationship("Ticket", back_populates="outcomes")

@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from app import create_app, db
-from app.models import Ticket, TicketAction, User
+from app.models import Ticket, TicketAction, TicketOutcome, User
 from app.services.ticket_actions import apply_ticket_action, initial_action_status
 
 
@@ -528,6 +528,29 @@ class AccessControlTests(unittest.TestCase):
             self.assertEqual(user.role, "REVIEWER")
             self.assertNotEqual(user.password_hash, "reviewer-password")
             self.assertTrue(user.verify_password("reviewer-password"))
+
+    def test_reviewer_can_record_outcome_but_agent_cannot(self):
+        with self.app.app_context():
+            reviewer = User(username="reviewer02", role="REVIEWER", is_active=True)
+            reviewer.set_password("reviewer-test-password")
+            ticket = db.session.get(Ticket, "T-ACCESS-001")
+            ticket.action_status = "CONFIRMED"
+            db.session.add(reviewer)
+            db.session.commit()
+        agent = self.app.test_client()
+        self.login_agent(agent)
+        page = agent.get("/tickets/T-ACCESS-001")
+        token = re.search(rb'<meta name="csrf-token" content="([^"]+)"', page.data).group(1).decode()
+        denied = agent.post("/tickets/T-ACCESS-001/outcomes", data={"csrf_token": token, "final_category": "THERMAL_COOLING", "resolution_status": "RESOLVED", "resolution_note": "现场确认冷却风扇更换后恢复正常。"})
+        self.assertEqual(denied.status_code, 302)
+        reviewer = self.app.test_client()
+        self.login(reviewer, "reviewer02", "reviewer-test-password")
+        page = reviewer.get("/tickets/T-ACCESS-001")
+        token = re.search(rb'<meta name="csrf-token" content="([^"]+)"', page.data).group(1).decode()
+        saved = reviewer.post("/tickets/T-ACCESS-001/outcomes", data={"csrf_token": token, "final_category": "THERMAL_COOLING", "resolution_status": "RESOLVED", "resolution_note": "现场确认冷却风扇更换后恢复正常。"})
+        self.assertEqual(saved.status_code, 302)
+        with self.app.app_context():
+            self.assertEqual(TicketOutcome.query.one().recorded_by, "reviewer02")
 
 
 if __name__ == "__main__":

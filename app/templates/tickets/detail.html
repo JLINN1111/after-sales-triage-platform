@@ -305,6 +305,17 @@
         {% endif %}
     {% endif %}
 
+    <h2 class="section-title">处理结果反馈</h2>
+    <p class="page-hint">仅复核主管或管理员可记录。反馈先作为待审核业务数据来源，不会自动进入模型训练或改变当前分诊结果。</p>
+    {% if can('outcome:record') and ticket.action_status in ['CONFIRMED', 'CLOSED'] %}
+    <form method="post" action="{{ url_for('tickets.record_outcome', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-row"><div class="form-field"><label>最终故障类别</label><select name="final_category" required>{% for code, name in display.category.items() %}<option value="{{ code }}" {% if code == (ticket.confirmed_category or ticket.predicted_category) %}selected{% endif %}>{{ name }}</option>{% endfor %}</select></div><div class="form-field"><label>处理结果</label><select name="resolution_status"><option value="RESOLVED">已解决</option><option value="PARTIALLY_RESOLVED">部分解决</option><option value="UNRESOLVED">未解决</option><option value="UNKNOWN">暂不确定</option></select></div></div>
+        <div class="form-field"><label>处理结果依据</label><textarea name="resolution_note" rows="3" minlength="10" required placeholder="记录已核对的处理结果、依据或未解决原因，不填写客户个人信息"></textarea></div><div class="form-actions"><button class="btn btn-primary" type="submit">记录处理结果</button></div>
+    </form>
+    {% endif %}
+    {% if ticket.outcomes %}<table class="detail-table"><tr><th>记录时间</th><th>最终类别</th><th>结果</th><th>依据</th><th>记录人</th></tr>{% for outcome in ticket.outcomes %}<tr><td>{{ outcome.recorded_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ display.category.get(outcome.final_category, outcome.final_category) }}</td><td>{{ resolution_status_zh.get(outcome.resolution_status, outcome.resolution_status) }}</td><td>{{ outcome.resolution_note }}</td><td>{{ outcome.recorded_by }}</td></tr>{% endfor %}</table>{% endif %}
+
     <h3 class="subsection-title">操作历史</h3>
     {% if ticket.actions %}
     <table class="detail-table">

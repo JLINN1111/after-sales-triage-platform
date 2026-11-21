@@ -12,7 +12,7 @@ from datetime import datetime
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 
 from app import db
-from app.models import Ticket, TicketAction
+from app.models import Ticket, TicketAction, TicketOutcome
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
 from app.services.llm_guard import guarded_llm_reference
 from app.services.llm_provider import configured_llm_invoke
@@ -365,6 +365,32 @@ def llm_reference(ticket_id):
     return jsonify({"ticket_id": ticket.ticket_id, **result}), 200
 
 
+@tickets_bp.post("/tickets/<ticket_id>/outcomes")
+@login_required
+@permission_required("outcome:record")
+def record_outcome(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    category = request.form.get("final_category", "")
+    resolution_status = request.form.get("resolution_status", "")
+    note = request.form.get("resolution_note", "").strip()
+    if ticket.action_status not in {"CONFIRMED", "CLOSED"}:
+        flash("请先完成复核确认后再记录处理结果。")
+    elif category not in DISPLAY["category"]:
+        flash("最终故障类别无效。")
+    elif resolution_status not in {"RESOLVED", "PARTIALLY_RESOLVED", "UNRESOLVED", "UNKNOWN"}:
+        flash("处理结果取值无效。")
+    elif len(note) < 10:
+        flash("请填写不少于 10 个字的处理结果依据。")
+    else:
+        db.session.add(TicketOutcome(
+            ticket=ticket, final_category=category, resolution_status=resolution_status,
+            resolution_note=note, recorded_by=current_user().username if current_user() else "SYSTEM",
+        ))
+        db.session.commit()
+        flash("已记录处理结果；该记录不会自动用于训练模型。")
+    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
+
+
 @tickets_bp.route("/tickets/<ticket_id>")
 @login_required
 @permission_required("ticket:view")
@@ -405,4 +431,5 @@ def ticket_detail(ticket_id):
         action_note_required=(ticket.action_status == "HUMAN_REVIEW" or needs_handoff_before_close(ticket)),
         llm_block_reasons=list(dict.fromkeys(llm_block_reasons)),
         llm_configured=llm_configured,
+        resolution_status_zh={"RESOLVED": "已解决", "PARTIALLY_RESOLVED": "部分解决", "UNRESOLVED": "未解决", "UNKNOWN": "暂不确定"},
     )
