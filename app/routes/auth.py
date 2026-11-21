@@ -3,7 +3,7 @@ import re
 from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 
 from app import db
-from app.models import User
+from app.models import User, TicketOutcome, TicketOutcomeReview
 from app.services.access_control import ROLE_LABELS, login_required, permission_required, current_user
 
 
@@ -119,3 +119,28 @@ def reset_password(user_id):
         db.session.commit()
         flash(f"已重置账号：{user.username} 的密码。")
     return redirect(url_for("auth.user_list"))
+
+
+@auth_bp.get("/admin/outcomes")
+@login_required
+@permission_required("outcome:approve")
+def outcome_review_list():
+    return render_template("auth/outcome_reviews.html", outcomes=TicketOutcome.query.order_by(TicketOutcome.recorded_at.desc()).all())
+
+
+@auth_bp.post("/admin/outcomes/<int:outcome_id>/review")
+@login_required
+@permission_required("outcome:approve")
+def review_outcome(outcome_id):
+    outcome = db.get_or_404(TicketOutcome, outcome_id)
+    decision = request.form.get("decision", "")
+    note = request.form.get("review_note", "").strip()
+    if outcome.review:
+        flash("该反馈已审核，不能重复处理。")
+    elif decision not in {"APPROVED", "REJECTED"} or len(note) < 10:
+        flash("请选择批准或拒收，并填写不少于 10 个字的审核说明。")
+    else:
+        db.session.add(TicketOutcomeReview(outcome=outcome, decision=decision, review_note=note, reviewed_by=current_user().username))
+        db.session.commit()
+        flash("已完成反馈审核。批准项仅作为后续训练候选，不会自动训练。")
+    return redirect(url_for("auth.outcome_review_list"))

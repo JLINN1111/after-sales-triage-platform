@@ -88,3 +88,15 @@ class TicketOutcome(db.Model):
     recorded_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     ticket = db.relationship("Ticket", back_populates="outcomes")
+    review = db.relationship("TicketOutcomeReview", back_populates="outcome", uselist=False, cascade="all, delete-orphan")
+
+
+class TicketOutcomeReview(db.Model):
+    __tablename__ = "ticket_outcome_reviews"
+    id = db.Column(db.Integer, primary_key=True)
+    outcome_id = db.Column(db.Integer, db.ForeignKey("ticket_outcomes.id"), nullable=False, unique=True, index=True)
+    decision = db.Column(db.String(16), nullable=False)
+    review_note = db.Column(db.Text, nullable=False)
+    reviewed_by = db.Column(db.String(64), nullable=False)
+    reviewed_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    outcome = db.relationship("TicketOutcome", back_populates="review")

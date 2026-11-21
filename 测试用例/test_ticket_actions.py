@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from app import create_app, db
-from app.models import Ticket, TicketAction, TicketOutcome, User
+from app.models import Ticket, TicketAction, TicketOutcome, TicketOutcomeReview, User
 from app.services.ticket_actions import apply_ticket_action, initial_action_status
 
 
@@ -551,6 +551,28 @@ class AccessControlTests(unittest.TestCase):
         self.assertEqual(saved.status_code, 302)
         with self.app.app_context():
             self.assertEqual(TicketOutcome.query.one().recorded_by, "reviewer02")
+
+    def test_admin_reviews_outcome_once_without_training_model(self):
+        with self.app.app_context():
+            ticket = db.session.get(Ticket, "T-ACCESS-001")
+            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="RESOLVED", resolution_note="现场确认冷却风扇更换后恢复正常。", recorded_by="reviewer02")
+            db.session.add(outcome)
+            db.session.commit()
+            outcome_id = outcome.id
+        client = self.app.test_client()
+        self.login(client, "admin01", "admin-test-password")
+        page = client.get("/admin/outcomes")
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        response = client.post(f"/admin/outcomes/{outcome_id}/review", data={"csrf_token": token, "decision": "APPROVED", "review_note": "已核对处理依据，允许进入后续训练候选审核。"})
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            review = TicketOutcomeReview.query.one()
+            self.assertEqual(review.decision, "APPROVED")
+            self.assertEqual(review.reviewed_by, "admin01")
+        repeated = client.post(f"/admin/outcomes/{outcome_id}/review", data={"csrf_token": token, "decision": "REJECTED", "review_note": "重复审核不应覆盖已有结论。"})
+        self.assertEqual(repeated.status_code, 302)
+        with self.app.app_context():
+            self.assertEqual(TicketOutcomeReview.query.count(), 1)
 
 
 if __name__ == "__main__":
