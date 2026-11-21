@@ -455,6 +455,9 @@ class AccessControlTests(unittest.TestCase):
             agent = User(username="agent01", role="AGENT", is_active=True)
             agent.set_password("safe-test-password")
             db.session.add(agent)
+            admin = User(username="admin01", role="ADMIN", is_active=True)
+            admin.set_password("admin-test-password")
+            db.session.add(admin)
             db.session.add(Ticket(
                 ticket_id="T-ACCESS-001", equipment_type="CNC",
                 description="控制柜温度过高，冷却风扇异常。", operating_state="RUNNING",
@@ -471,10 +474,13 @@ class AccessControlTests(unittest.TestCase):
         self.tempdir.cleanup()
 
     def login_agent(self, client):
+        self.login(client, "agent01", "safe-test-password")
+
+    def login(self, client, username, password):
         page = client.get("/login")
         token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
         response = client.post("/login", data={
-            "csrf_token": token, "username": "agent01", "password": "safe-test-password",
+            "csrf_token": token, "username": username, "password": password,
         })
         self.assertEqual(response.status_code, 302)
 
@@ -502,6 +508,26 @@ class AccessControlTests(unittest.TestCase):
         self.assertEqual(allowed.status_code, 200)
         with self.app.app_context():
             self.assertEqual(TicketAction.query.one().action_by, "agent01")
+
+    def test_only_admin_can_manage_accounts_and_password_is_hashed(self):
+        agent_client = self.app.test_client()
+        self.login_agent(agent_client)
+        self.assertEqual(agent_client.get("/admin/users").status_code, 302)
+
+        admin_client = self.app.test_client()
+        self.login(admin_client, "admin01", "admin-test-password")
+        page = admin_client.get("/admin/users")
+        self.assertEqual(page.status_code, 200)
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        created = admin_client.post("/admin/users", data={
+            "csrf_token": token, "username": "reviewer01", "password": "reviewer-password", "role": "REVIEWER",
+        })
+        self.assertEqual(created.status_code, 302)
+        with self.app.app_context():
+            user = User.query.filter_by(username="reviewer01").one()
+            self.assertEqual(user.role, "REVIEWER")
+            self.assertNotEqual(user.password_hash, "reviewer-password")
+            self.assertTrue(user.verify_password("reviewer-password"))
 
 
 if __name__ == "__main__":
