@@ -184,6 +184,42 @@ class TicketActionTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["status"], "DISABLED")
         self.assertIsNone(response.get_json()["reference"])
+        with self.app.app_context():
+            audit = TicketAction.query.filter_by(action_type="LLM_REFERENCE").one()
+            self.assertEqual(audit.action_by, "SYSTEM")
+            self.assertEqual(audit.new_values["llm_status"], "DISABLED")
+            self.assertNotIn(self.get_ticket().description, str(audit.new_values))
+
+    def test_llm_reference_success_has_per_ticket_cooldown_and_safe_audit(self):
+        self.app.config.update(
+            LLM_ENABLED=True,
+            LLM_ALLOW_EXTERNAL_CALLS=True,
+            LLM_PROVIDER="deepseek",
+            LLM_REFERENCE_COOLDOWN_SECONDS=60,
+        )
+        safe_rules_result = {
+            "predicted_category": "THERMAL_COOLING",
+            "recommend_human": False,
+            "missing_fields": [],
+        }
+        reference = {
+            "status": "REFERENCE",
+            "reasons": ["仅供客服参考，仍需人工确认"],
+            "reference": {"reference_category": "THERMAL_COOLING"},
+        }
+        with patch("app.routes.tickets.triage_ticket", return_value=safe_rules_result), patch(
+            "app.routes.tickets.guarded_llm_reference", return_value=reference
+        ) as guarded:
+            client = self.app.test_client()
+            first = client.post("/tickets/T-ACTION-001/llm-reference")
+            second = client.post("/tickets/T-ACTION-001/llm-reference")
+        self.assertEqual(first.get_json()["status"], "REFERENCE")
+        self.assertEqual(second.get_json()["status"], "BLOCKED")
+        self.assertEqual(guarded.call_count, 1)
+        with self.app.app_context():
+            audits = TicketAction.query.filter_by(action_type="LLM_REFERENCE").all()
+            self.assertEqual([item.new_values["llm_status"] for item in audits], ["REFERENCE", "BLOCKED"])
+            self.assertTrue(all(self.get_ticket().description not in str(item.new_values) for item in audits))
 
     def test_detail_explains_when_deepseek_is_not_enabled(self):
         response = self.app.test_client().get("/tickets/T-ACTION-001")

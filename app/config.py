@@ -24,4 +24,5 @@ class Config:
     LLM_ALIYUN_MODEL = os.getenv("LLM_ALIYUN_MODEL", "qwen-plus")
     LLM_DEEPSEEK_BASE_URL = os.getenv("LLM_DEEPSEEK_BASE_URL", "https://api.deepseek.com").rstrip("/")
     LLM_DEEPSEEK_MODEL = os.getenv("LLM_DEEPSEEK_MODEL", "deepseek-flash")
+    LLM_REFERENCE_COOLDOWN_SECONDS = int(os.getenv("LLM_REFERENCE_COOLDOWN_SECONDS", "60"))
 
