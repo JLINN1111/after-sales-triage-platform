@@ -8,4 +8,7 @@ __pycache__/
 .pytest_cache/
 .idea/
 
+# 仅供本机新对话读取的交接内容，绝不提交到远程仓库
+交接_handoff/本机新窗口交接_不推送/
+
 
