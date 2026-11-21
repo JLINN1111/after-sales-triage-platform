@@ -1,0 +1,11 @@
+case_id,equipment_scope,alarm_code,description,source_type,source_id,human_review_required,review_note
+ME-001,通用数控设备,,传动侧运行时持续有异响，伴随明显振动,课程模拟,COURSE-MECHANICAL-001,true,需人工核对传动状态
+ME-002,通用数控设备,,主轴转动声音异常，设备振动比平时大,课程模拟,COURSE-MECHANICAL-001,true,不可远程判断部件原因
+ME-003,通用加工设备,,机构动作不顺畅，偶尔出现卡滞，未提供报警代码,课程模拟,COURSE-MECHANICAL-001,true,信息不完整
+ME-004,输送线,,输送带运行时跑偏，并听到连续摩擦声,课程模拟,COURSE-MECHANICAL-001,true,需人工检查现场
+ME-005,通用传动设备,,设备启动后传动部位有间歇性敲击声,课程模拟,COURSE-MECHANICAL-001,true,需人工确认
+ME-006,通用传动设备,,传动机构有摩擦声和振动，监控数据仍连续更新,课程模拟,COURSE-MECHANICAL-002,true,与通信异常区分
+ME-007,通用加工设备,,设备运行有卡滞感，未出现通信中断或数据丢失提示,课程模拟,COURSE-MECHANICAL-002,true,与通信异常区分
+ME-008,通用加工设备,,设备有异响和振动，但未观察到温度报警或冷却异常,课程模拟,COURSE-MECHANICAL-002,true,与温度异常区分
+ME-009,通用设备,,设备运行时出现摩擦声，客户无法确认是否已经停机,课程模拟,COURSE-MECHANICAL-002,true,停机状态未知
+ME-010,通用设备,,设备振动明显，客户无法确认现场是否存在安全风险,课程模拟,COURSE-MECHANICAL-002,true,安全状态未知

@@ -1,0 +1,10 @@
+{
+  "data_scope": "固定案例家族隔离验证集，仅确认阈值；冻结最终测试集未读取。",
+  "threshold": 0.7,
+  "sample_count": 60,
+  "accepted_count": 29,
+  "coverage": 0.48333333333333334,
+  "accepted_precision": 1.0,
+  "rejected_count": 31,
+  "policy": "阈值以下、规则冲突、高风险、停机、状态未知或信息不完整均应人工复核；本结果不授权自动放行。"
+}

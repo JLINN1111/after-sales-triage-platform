@@ -3,6 +3,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from app import create_app, db
 from app.models import Ticket, TicketAction
@@ -16,6 +17,8 @@ class TicketActionTests(unittest.TestCase):
         self.app = create_app({
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database}",
+            "LLM_ENABLED": False,
+            "LLM_ALLOW_EXTERNAL_CALLS": False,
         })
         with self.app.app_context():
             db.create_all()
@@ -169,6 +172,44 @@ class TicketActionTests(unittest.TestCase):
         })
         self.assertEqual(response.status_code, 400)
         self.assertIn("当前状态不允许", response.get_json()["error"])
+
+    def test_llm_reference_endpoint_is_disabled_without_explicit_enablement(self):
+        safe_rules_result = {
+            "predicted_category": "THERMAL_COOLING",
+            "recommend_human": False,
+            "missing_fields": [],
+        }
+        with patch("app.routes.tickets.triage_ticket", return_value=safe_rules_result):
+            response = self.app.test_client().post("/tickets/T-ACTION-001/llm-reference")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "DISABLED")
+        self.assertIsNone(response.get_json()["reference"])
+
+    def test_detail_explains_when_deepseek_is_not_enabled(self):
+        response = self.app.test_client().get("/tickets/T-ACTION-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("DeepSeek 客服参考".encode("utf-8"), response.data)
+        self.assertIn("尚未在本机启用".encode("utf-8"), response.data)
+        self.assertNotIn(b"llm-reference-button", response.data)
+
+    def test_detail_shows_manual_deepseek_button_only_when_eligible(self):
+        self.app.config.update(LLM_ENABLED=True, LLM_ALLOW_EXTERNAL_CALLS=True, LLM_PROVIDER="deepseek")
+        response = self.app.test_client().get("/tickets/T-ACTION-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"llm-reference-button", response.data)
+        self.assertIn("仅供人工客服参考".encode("utf-8"), response.data)
+
+    def test_detail_hides_deepseek_button_for_safety_risk(self):
+        self.app.config.update(LLM_ENABLED=True, LLM_ALLOW_EXTERNAL_CALLS=True, LLM_PROVIDER="deepseek")
+        with self.app.app_context():
+            ticket = self.get_ticket()
+            ticket.safety_risk = "YES"
+            ticket.recommend_human = True
+            db.session.commit()
+        response = self.app.test_client().get("/tickets/T-ACTION-001")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(b"llm-reference-button", response.data)
+        self.assertIn("安全风险需要人工确认".encode("utf-8"), response.data)
 
     def test_detail_displays_action_history(self):
         with self.app.app_context():

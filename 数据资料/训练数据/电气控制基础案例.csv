@@ -1,0 +1,11 @@
+case_id,equipment_scope,alarm_code,description,source_type,source_id,human_review_required,review_note
+EC-001,Altivar 320,SCF4,变频器显示SCF4，设备无法启动，客户无法判断电机和电缆情况,公开资料改写,SCHNEIDER-ATV320-SCF4,true,短路风险必须人工确认
+EC-002,Altivar 320,OLF,变频器提示OLF，电机停止运行，现场未确认负载和参数情况,公开资料改写,SCHNEIDER-ATV320-OLF,true,过载情形转人工核对
+EC-003,通用控制柜,,通电后控制面板没有显示，启动按钮没有反应,课程模拟,COURSE-ELECTRICAL-001,true,需人工核对供电与设备信息
+EC-004,通用控制柜,,设备运行中控制屏黑屏，按键无法操作,课程模拟,COURSE-ELECTRICAL-001,true,需确认是否停机和安全风险
+EC-005,通用控制系统,,控制器反复重启，设备无法进入正常操作界面,课程模拟,COURSE-ELECTRICAL-001,true,不可远程判断根因
+EC-006,通用控制系统,,控制器提示故障，启动指令不能执行，但设备没有温度报警,课程模拟,COURSE-ELECTRICAL-002,true,与温度异常区分
+EC-007,通用控制系统,,设备控制屏正常显示，但无法接收外部操作指令,课程模拟,COURSE-ELECTRICAL-002,true,需与通信异常人工核对
+EC-008,通用控制柜,,设备上电后显示异常，客户未提供报警代码,课程模拟,COURSE-ELECTRICAL-002,true,报警信息缺失
+EC-009,通用控制柜,,客户称柜体未发热但面板持续重启，设备不能启动,课程模拟,COURSE-ELECTRICAL-002,true,与温度异常区分
+EC-010,通用设备,,控制器有报警提示但采集数据仍正常更新，操作按键无响应,课程模拟,COURSE-ELECTRICAL-002,true,与通信异常区分

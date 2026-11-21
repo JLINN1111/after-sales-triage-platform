@@ -53,3 +53,8 @@ a:hover { text-decoration: underline; }
 }
 .btn-delete:hover { text-decoration: underline; color: #96281b; }
 .action-form { margin-bottom: 18px; }
+.llm-reference-panel { margin-bottom: 18px; }
+.llm-reference-note { margin: 8px 0 0; }
+.llm-reference-result { margin-top: 12px; }
+.llm-reference-result p { margin: 8px 0 0; }
+.btn:disabled { cursor: wait; opacity: 0.65; }

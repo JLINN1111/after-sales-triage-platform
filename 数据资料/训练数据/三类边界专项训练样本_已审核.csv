@@ -1,0 +1,13 @@
+sample_id,case_id,category,description,source_id,human_review_required,review_status,contrast_focus
+TCX-021-A,TCX-021,THERMAL_COOLING,设备连续加工后控制柜温度上升且散热风扇声音变大，控制屏操作仍正常,COURSE-THERMAL-CONTRAST,true,已审核,区别于控制屏故障
+TCX-022-A,TCX-022,THERMAL_COOLING,冷却风扇没有启动，设备当前仍在运行，客户无法确认是否需要停机,COURSE-THERMAL-CONTRAST,true,已审核,运行状态需人工确认
+TCX-023-A,TCX-023,THERMAL_COOLING,加工区冷却液流量变小并出现温度提示，采集数据没有中断,COURSE-THERMAL-CONTRAST,true,已审核,区别于通信中断
+TCX-024-A,TCX-024,THERMAL_COOLING,主轴附近持续发热，控制界面显示正常，客户未记录具体温度报警代码,COURSE-THERMAL-CONTRAST,true,已审核,报警信息不完整
+MEX-011-A,MEX-011,MECHANICAL,输送机构运行时向一侧跑偏并持续摩擦，控制页面没有通信报警提示,COURSE-MECHANICAL-CONTRAST,true,已审核,区别于传感通信
+MEX-012-A,MEX-012,MECHANICAL,主轴运转伴随敲击声和明显振动，控制屏显示与按键操作均正常,COURSE-MECHANICAL-CONTRAST,true,已审核,区别于电气控制
+MEX-013-A,MEX-013,MECHANICAL,机构移动阻力增大并偶发卡滞，客户无法确认设备是否已经停机,COURSE-MECHANICAL-CONTRAST,true,已审核,停机状态需人工确认
+MEX-014-A,MEX-014,MECHANICAL,传动侧摩擦异响持续出现，但温度读数和冷却风扇状态未见异常,COURSE-MECHANICAL-CONTRAST,true,已审核,区别于温度冷却
+SCX-011-A,SCX-011,SENSOR_COMMUNICATION,控制屏仍可操作，但传感器数值持续跳变且设备外壳没有实际发热,COURSE-COMM-CONTRAST,true,已审核,区别于温度冷却
+SCX-012-A,SCX-012,SENSOR_COMMUNICATION,采集数据停止刷新并提示通信问题，客户未发现控制屏黑屏或按键失效,COURSE-COMM-CONTRAST,true,已审核,区别于电气控制
+SCX-013-A,SCX-013,SENSOR_COMMUNICATION,控制器间歇提示信号接收失败，设备机械传动未报告异响或振动,COURSE-COMM-CONTRAST,true,已审核,区别于机械传动
+SCX-014-A,SCX-014,SENSOR_COMMUNICATION,设备状态页面无法读取，现场无法确认运行状态和安全风险,COURSE-COMM-CONTRAST,true,已审核,信息不完整需人工确认

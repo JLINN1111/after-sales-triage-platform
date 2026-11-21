@@ -11,7 +11,7 @@
 安全边界：
     - 仅公开基准设备提供标准设备键，不得当作企业实际资产。
     - 无台账映射（工单设备编号未在台账登记）时禁止 EXACT。
-    - 安全风险 / 已停机时降级为 REFERENCE，不输出确定结论。
+    - 安全风险或停机状态为“是”或“未知”时降级为 REFERENCE，不输出确定结论。
 """
 
 import csv
@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from app.config import ROOT
+from app.algorithms.knowledge_retrieval import bfs_recall, rank_candidates
 
 KNOWLEDGE_CSV = ROOT / "数据资料" / "维修知识" / "知识库.csv"
 LEDGER_CSV = ROOT / "数据资料" / "真实业务准备" / "设备台账.csv"
@@ -42,9 +43,10 @@ SUBSYSTEM_KEYWORDS = {
     "COOLANT_SYSTEM": ("冷却液", "冷却", "切削液", "喷嘴", "流量", "液位", "泵"),
     "PNEUMATIC": ("气压", "气流", "压缩空气", "气源"),
     "LUBRICATION": ("润滑", "残余压力", "残压", "油脂", "润滑油"),
-    "DRIVE_MOTOR": ("电机过载", "电机", "过载", "OLF"),
-    "DRIVE_ELECTRICAL": ("IGBT", "短路", "SCF", "电缆"),
+    "DRIVE_MOTOR": ("电机过载", "电机", "过载", "过流", "OLF"),
+    "DRIVE_ELECTRICAL": ("IGBT", "短路", "SCF", "电缆", "接地", "漏电", "缺相", "相位丢失"),
     "DRIVE_SAFETY": ("安全转矩", "转矩关断", "STO", "5091"),
+    "CONVEYOR_BELT_TRACKING": ("皮带跑偏", "跑偏", "皮带偏移", "皮带不居中", "输送带偏"),
 }
 
 
@@ -90,17 +92,14 @@ def _reference_candidates(
     category: str | None, subsystems: set[str], description: str, rows: list[dict[str, str]]
 ) -> list[dict[str, str]]:
     """第一层：设备大类 + 子系统召回参考候选；数控控制线索额外召回 CNC_CONTROL。"""
-    candidates = [
-        row for row in rows
-        if category and row["equipment_category"] == category and row["subsystem"] in subsystems
-    ]
+    candidates = bfs_recall(rows, category, subsystems)
     if category == "CNC_MACHINING" and any(clue in (description or "") for clue in CNC_CONTROL_CLUES):
         seen = {row["knowledge_id"] for row in candidates}
         for row in rows:
             if row["equipment_category"] == "CNC_CONTROL" and row["knowledge_id"] not in seen:
                 candidates.append(row)
                 seen.add(row["knowledge_id"])
-    return candidates
+    return rank_candidates(description, candidates)
 
 
 def _exact_candidates(
@@ -150,9 +149,13 @@ def match_knowledge(ticket: Any, rules_result: Mapping[str, Any]) -> dict[str, A
 
     exact = _exact_candidates(ticket, category, ledger, rows)
 
-    # 安全优先：安全风险或已停机时不输出确定维修结论
-    unsafe = _value(ticket, "safety_risk") == "YES" or _value(ticket, "shutdown") == "YES"
-    if unsafe:
+    # 安全优先：风险/停机“未知”同样不能把资料显示为精确适用。
+    # 规则层会保留人工确认；此处同步降级匹配等级，避免前台产生确定性暗示。
+    requires_conservative_reference = (
+        _value(ticket, "safety_risk") in {"YES", "UNKNOWN"}
+        or _value(ticket, "shutdown") in {"YES", "UNKNOWN"}
+    )
+    if requires_conservative_reference:
         exact = []
 
     # 多个同等候选不算精确（约定：存在多个同等候选时改为参考 + 人工确认）

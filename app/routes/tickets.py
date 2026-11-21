@@ -9,11 +9,13 @@
 
 from datetime import datetime
 
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 
 from app import db
 from app.models import Ticket
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
+from app.services.llm_guard import guarded_llm_reference
+from app.services.llm_provider import configured_llm_invoke
 from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
 from app.services.triage_service import triage_ticket
 
@@ -289,12 +291,37 @@ def ticket_action(ticket_id):
     return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
 
 
+@tickets_bp.route("/tickets/<ticket_id>/llm-reference", methods=["POST"])
+def llm_reference(ticket_id):
+    """仅在客服显式发起时请求外部模型；结果不写回分诊或工单状态。"""
+    ticket = Ticket.query.get_or_404(ticket_id)
+    rules_result = triage_ticket(ticket, match_knowledge)
+    result = guarded_llm_reference(
+        ticket, rules_result, configured_llm_invoke(current_app.config),
+    )
+    return jsonify({"ticket_id": ticket.ticket_id, **result}), 200
+
+
 @tickets_bp.route("/tickets/<ticket_id>")
 def ticket_detail(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     match_level = ticket.knowledge_match_level
     has_handoff = any(action.action_type == "HANDOFF" for action in ticket.actions)
     action_details = {action.id: action_detail(action) for action in ticket.actions}
+    llm_block_reasons = []
+    if ticket.safety_risk in {"YES", "UNKNOWN"}:
+        llm_block_reasons.append("安全风险需要人工确认，未调用大模型。")
+    if ticket.shutdown in {"YES", "UNKNOWN"}:
+        llm_block_reasons.append("停机状态需要人工确认，未调用大模型。")
+    if ticket.recommend_human:
+        llm_block_reasons.append("系统已要求人工确认，未调用大模型。")
+    if ticket.follow_up_questions:
+        llm_block_reasons.append("关键信息尚未补全，未调用大模型。")
+    llm_configured = (
+        bool(current_app.config.get("LLM_ENABLED"))
+        and bool(current_app.config.get("LLM_ALLOW_EXTERNAL_CALLS"))
+        and current_app.config.get("LLM_PROVIDER") == "deepseek"
+    )
     return render_template(
         "tickets/detail.html",
         ticket=ticket,
@@ -311,4 +338,6 @@ def ticket_detail(ticket_id):
         has_handoff=has_handoff,
         action_details=action_details,
         action_note_required=(ticket.action_status == "HUMAN_REVIEW" or needs_handoff_before_close(ticket)),
+        llm_block_reasons=list(dict.fromkeys(llm_block_reasons)),
+        llm_configured=llm_configured,
     )

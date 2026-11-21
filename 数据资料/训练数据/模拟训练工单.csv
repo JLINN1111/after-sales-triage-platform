@@ -1,0 +1,241 @@
+﻿sample_id,split,category,description,source_type,source_id,equipment_scope,alarm_code,shutdown,safety_risk,human_review_required,review_note
+SIM-THE-T-001,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-002,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-003,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-004,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-005,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-006,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-007,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-008,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-009,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-010,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-011,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-012,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-013,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-014,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-015,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-016,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-017,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-018,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-019,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-020,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-021,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-022,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-023,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-024,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-025,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-026,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-027,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-028,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-029,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-030,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-031,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-032,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-033,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-034,train,THERMAL_COOLING,控制柜温度报警，风扇声音异常，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-035,train,THERMAL_COOLING,冷却液流量明显变小，屏幕提示冷却相关报警，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-036,train,THERMAL_COOLING,温控报警出现前设备仍能操作，冷却液循环明显变弱，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-001,validation,THERMAL_COOLING,设备连续运行后温度升高，外壳发烫，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-002,validation,THERMAL_COOLING,加工过程中温控报警反复出现，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-003,validation,THERMAL_COOLING,设备连续运行后温度升高，外壳发烫，暂未确认是否需要停机。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-004,validation,THERMAL_COOLING,加工过程中温控报警反复出现，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-005,validation,THERMAL_COOLING,设备连续运行后温度升高，外壳发烫，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-006,validation,THERMAL_COOLING,加工过程中温控报警反复出现，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-007,validation,THERMAL_COOLING,设备连续运行后温度升高，外壳发烫，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-008,validation,THERMAL_COOLING,加工过程中温控报警反复出现，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-009,validation,THERMAL_COOLING,设备连续运行后温度升高，外壳发烫，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-010,validation,THERMAL_COOLING,加工过程中温控报警反复出现，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-011,validation,THERMAL_COOLING,设备连续运行后温度升高，外壳发烫，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-V-012,validation,THERMAL_COOLING,加工过程中温控报警反复出现，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-001,test,THERMAL_COOLING,主轴附近温度持续升高，冷却效果变差，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-002,test,THERMAL_COOLING,控制柜屏幕出现温度提示，同时听到冷却风扇转速异常，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-003,test,THERMAL_COOLING,主轴附近温度持续升高，冷却效果变差，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-004,test,THERMAL_COOLING,控制柜屏幕出现温度提示，同时听到冷却风扇转速异常，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-005,test,THERMAL_COOLING,主轴附近温度持续升高，冷却效果变差，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-006,test,THERMAL_COOLING,控制柜屏幕出现温度提示，同时听到冷却风扇转速异常，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-007,test,THERMAL_COOLING,主轴附近温度持续升高，冷却效果变差，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-008,test,THERMAL_COOLING,控制柜屏幕出现温度提示，同时听到冷却风扇转速异常，报警代码暂未记录。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-009,test,THERMAL_COOLING,主轴附近温度持续升高，冷却效果变差，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-010,test,THERMAL_COOLING,控制柜屏幕出现温度提示，同时听到冷却风扇转速异常，需要进一步核对设备型号。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-011,test,THERMAL_COOLING,主轴附近温度持续升高，冷却效果变差，客户无法判断是否存在安全风险。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-THE-T-012,test,THERMAL_COOLING,控制柜屏幕出现温度提示，同时听到冷却风扇转速异常，请协助确认处理方向。,公开资料改写,SIEMENS-808D-SERVICE-2017,SINUMERIK 808D,700018|700019,UNKNOWN,UNKNOWN,true,冷却/温控异常仅作为客服分诊线索；停机或风险未知时必须转人工。
+SIM-MEC-T-001,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-002,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-003,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-004,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-005,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-006,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-007,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-008,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-009,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-010,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-011,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-012,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，客户无法判断是否存在安全风险。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-013,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-014,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-015,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-016,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，客户无法判断是否存在安全风险。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-017,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-018,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-019,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-020,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-021,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-022,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-023,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-024,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-025,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-026,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，客户无法判断是否存在安全风险。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-027,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-028,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-029,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-030,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-031,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-032,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-033,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-034,train,MECHANICAL,传动侧运行时持续有异响，伴随明显振动，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-035,train,MECHANICAL,输送带运行时跑偏，并听到摩擦声，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-036,train,MECHANICAL,设备运行有卡滞感，未出现通信中断或数据丢失提示，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-001,validation,MECHANICAL,主轴转动时声音异常，设备振动比平时大，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-002,validation,MECHANICAL,设备启动后传动部位有间歇性敲击声，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-003,validation,MECHANICAL,主轴转动时声音异常，设备振动比平时大，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-004,validation,MECHANICAL,设备启动后传动部位有间歇性敲击声，暂未确认是否需要停机。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-005,validation,MECHANICAL,主轴转动时声音异常，设备振动比平时大，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-006,validation,MECHANICAL,设备启动后传动部位有间歇性敲击声，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-007,validation,MECHANICAL,主轴转动时声音异常，设备振动比平时大，客户无法判断是否存在安全风险。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-008,validation,MECHANICAL,设备启动后传动部位有间歇性敲击声，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-009,validation,MECHANICAL,主轴转动时声音异常，设备振动比平时大，客户无法判断是否存在安全风险。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-010,validation,MECHANICAL,设备启动后传动部位有间歇性敲击声，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-011,validation,MECHANICAL,主轴转动时声音异常，设备振动比平时大，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-V-012,validation,MECHANICAL,设备启动后传动部位有间歇性敲击声，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-001,test,MECHANICAL,机构动作不顺畅，偶尔出现卡滞，客户无法判断是否存在安全风险。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-002,test,MECHANICAL,传动机构有摩擦声和振动，但屏幕上的传感数据仍连续更新，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-003,test,MECHANICAL,机构动作不顺畅，偶尔出现卡滞，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-004,test,MECHANICAL,传动机构有摩擦声和振动，但屏幕上的传感数据仍连续更新，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-005,test,MECHANICAL,机构动作不顺畅，偶尔出现卡滞，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-006,test,MECHANICAL,传动机构有摩擦声和振动，但屏幕上的传感数据仍连续更新，客户无法判断是否存在安全风险。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-007,test,MECHANICAL,机构动作不顺畅，偶尔出现卡滞，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-008,test,MECHANICAL,传动机构有摩擦声和振动，但屏幕上的传感数据仍连续更新，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-009,test,MECHANICAL,机构动作不顺畅，偶尔出现卡滞，需要进一步核对设备型号。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-010,test,MECHANICAL,传动机构有摩擦声和振动，但屏幕上的传感数据仍连续更新，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-011,test,MECHANICAL,机构动作不顺畅，偶尔出现卡滞，请协助确认处理方向。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-MEC-T-012,test,MECHANICAL,传动机构有摩擦声和振动，但屏幕上的传感数据仍连续更新，报警代码暂未记录。,课程模拟,COURSE-MECHANICAL-001,通用传动设备,,UNKNOWN,UNKNOWN,true,仅记录客户可观察到的异响、振动或卡滞，不推断部件损坏。
+SIM-ELE-T-001,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-002,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-003,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-004,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-005,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-006,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-007,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-008,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-009,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-010,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-011,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-012,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-013,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-014,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-015,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-016,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-017,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-018,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-019,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-020,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-021,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-022,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-023,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-024,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-025,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-026,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-027,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-028,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-029,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-030,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-031,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-032,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-033,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-034,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-035,train,ELECTRICAL_CONTROL,通电后控制面板没有显示，设备无法启动，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-036,train,ELECTRICAL_CONTROL,设备上电后显示异常，无法进入正常操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-001,validation,ELECTRICAL_CONTROL,设备运行中控制屏突然黑屏，按键没有反应，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-002,validation,ELECTRICAL_CONTROL,操作面板反复重启，设备不能正常开始工作，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-003,validation,ELECTRICAL_CONTROL,设备运行中控制屏突然黑屏，按键没有反应，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-004,validation,ELECTRICAL_CONTROL,操作面板反复重启，设备不能正常开始工作，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-005,validation,ELECTRICAL_CONTROL,设备运行中控制屏突然黑屏，按键没有反应，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-006,validation,ELECTRICAL_CONTROL,操作面板反复重启，设备不能正常开始工作，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-007,validation,ELECTRICAL_CONTROL,设备运行中控制屏突然黑屏，按键没有反应，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-008,validation,ELECTRICAL_CONTROL,操作面板反复重启，设备不能正常开始工作，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-009,validation,ELECTRICAL_CONTROL,设备运行中控制屏突然黑屏，按键没有反应，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-010,validation,ELECTRICAL_CONTROL,操作面板反复重启，设备不能正常开始工作，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-011,validation,ELECTRICAL_CONTROL,设备运行中控制屏突然黑屏，按键没有反应，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-V-012,validation,ELECTRICAL_CONTROL,操作面板反复重启，设备不能正常开始工作，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-001,test,ELECTRICAL_CONTROL,控制器提示故障，启动指令无法执行，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-002,test,ELECTRICAL_CONTROL,控制柜供电正常但触摸屏无显示，设备无法进入操作界面，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-003,test,ELECTRICAL_CONTROL,控制器提示故障，启动指令无法执行，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-004,test,ELECTRICAL_CONTROL,控制柜供电正常但触摸屏无显示，设备无法进入操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-005,test,ELECTRICAL_CONTROL,控制器提示故障，启动指令无法执行，需要进一步核对设备型号。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-006,test,ELECTRICAL_CONTROL,控制柜供电正常但触摸屏无显示，设备无法进入操作界面，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-007,test,ELECTRICAL_CONTROL,控制器提示故障，启动指令无法执行，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-008,test,ELECTRICAL_CONTROL,控制柜供电正常但触摸屏无显示，设备无法进入操作界面，请协助确认处理方向。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-009,test,ELECTRICAL_CONTROL,控制器提示故障，启动指令无法执行，暂未确认是否需要停机。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-010,test,ELECTRICAL_CONTROL,控制柜供电正常但触摸屏无显示，设备无法进入操作界面，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-011,test,ELECTRICAL_CONTROL,控制器提示故障，启动指令无法执行，报警代码暂未记录。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-ELE-T-012,test,ELECTRICAL_CONTROL,控制柜供电正常但触摸屏无显示，设备无法进入操作界面，客户无法判断是否存在安全风险。,公开资料改写,SCHNEIDER-ATV320-SCF4,Altivar 320,SCF4,UNKNOWN,UNKNOWN,true,功率或电缆短路风险不作远程诊断，必须人工确认。
+SIM-SEN-T-001,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-002,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-003,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-004,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-005,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-006,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-007,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-008,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-009,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-010,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-011,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-012,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-013,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-014,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-015,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-016,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-017,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-018,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-019,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-020,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-021,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-022,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-023,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-024,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-025,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-026,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-027,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-028,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-029,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-030,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-031,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-032,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-033,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-034,train,SENSOR_COMMUNICATION,传感器读数跳动，屏幕显示数据异常，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-035,train,SENSOR_COMMUNICATION,运行中采集数据丢失，报警信息不完整，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-036,train,SENSOR_COMMUNICATION,冷却风扇运行正常，控制器仍提示采集信号丢失，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-001,validation,SENSOR_COMMUNICATION,设备提示通信中断，采集数据无法更新，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-002,validation,SENSOR_COMMUNICATION,通信报警反复出现，设备状态无法正常读取，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-003,validation,SENSOR_COMMUNICATION,设备提示通信中断，采集数据无法更新，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-004,validation,SENSOR_COMMUNICATION,通信报警反复出现，设备状态无法正常读取，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-005,validation,SENSOR_COMMUNICATION,设备提示通信中断，采集数据无法更新，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-006,validation,SENSOR_COMMUNICATION,通信报警反复出现，设备状态无法正常读取，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-007,validation,SENSOR_COMMUNICATION,设备提示通信中断，采集数据无法更新，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-008,validation,SENSOR_COMMUNICATION,通信报警反复出现，设备状态无法正常读取，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-009,validation,SENSOR_COMMUNICATION,设备提示通信中断，采集数据无法更新，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-010,validation,SENSOR_COMMUNICATION,通信报警反复出现，设备状态无法正常读取，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-011,validation,SENSOR_COMMUNICATION,设备提示通信中断，采集数据无法更新，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-V-012,validation,SENSOR_COMMUNICATION,通信报警反复出现，设备状态无法正常读取，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-001,test,SENSOR_COMMUNICATION,控制器间歇提示无法接收传感信号，需要进一步核对设备型号。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-002,test,SENSOR_COMMUNICATION,屏幕数据不更新并提示通信中断，未观察到设备发热或风扇异常，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-003,test,SENSOR_COMMUNICATION,控制器间歇提示无法接收传感信号，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-004,test,SENSOR_COMMUNICATION,屏幕数据不更新并提示通信中断，未观察到设备发热或风扇异常，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-005,test,SENSOR_COMMUNICATION,控制器间歇提示无法接收传感信号，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-006,test,SENSOR_COMMUNICATION,屏幕数据不更新并提示通信中断，未观察到设备发热或风扇异常，客户无法判断是否存在安全风险。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-007,test,SENSOR_COMMUNICATION,控制器间歇提示无法接收传感信号，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-008,test,SENSOR_COMMUNICATION,屏幕数据不更新并提示通信中断，未观察到设备发热或风扇异常，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-009,test,SENSOR_COMMUNICATION,控制器间歇提示无法接收传感信号，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-010,test,SENSOR_COMMUNICATION,屏幕数据不更新并提示通信中断，未观察到设备发热或风扇异常，请协助确认处理方向。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-011,test,SENSOR_COMMUNICATION,控制器间歇提示无法接收传感信号，报警代码暂未记录。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。
+SIM-SEN-T-012,test,SENSOR_COMMUNICATION,屏幕数据不更新并提示通信中断，未观察到设备发热或风扇异常，暂未确认是否需要停机。,课程模拟,COURSE-COMM-001,通用控制系统,,UNKNOWN,UNKNOWN,true,通信和传感现象需结合设备型号、报警信息人工核对。

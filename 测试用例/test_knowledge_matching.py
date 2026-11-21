@@ -4,6 +4,7 @@
 """
 
 import unittest
+from unittest.mock import patch
 
 from app.services.knowledge_matcher import match_knowledge
 from app.services.triage_service import triage_ticket
@@ -86,6 +87,51 @@ class KnowledgeMatchingTests(unittest.TestCase):
         result = match_knowledge(ticket, {})
         self.assertEqual(result["knowledge_match_level"], "REFERENCE")
 
+    def test_unknown_safety_risk_downgrades_exact_to_reference(self):
+        ticket = make_ticket(
+            equipment_type="CNC", equipment_code="BASELINE-VF2-001",
+            description="控制柜温度过高", alarm_code="253", safety_risk="UNKNOWN",
+        )
+        result = match_knowledge(ticket, {})
+        self.assertEqual(result["knowledge_match_level"], "REFERENCE")
+        self.assertEqual(result["knowledge_ids"], [])
+
+    def test_unknown_shutdown_downgrades_exact_to_reference(self):
+        ticket = make_ticket(
+            equipment_type="CNC", equipment_code="BASELINE-VF2-001",
+            description="控制柜温度过高", alarm_code="253", shutdown="UNKNOWN",
+        )
+        result = match_knowledge(ticket, {})
+        self.assertEqual(result["knowledge_match_level"], "REFERENCE")
+        self.assertEqual(result["knowledge_ids"], [])
+
+    def test_new_abb_overcurrent_entry_is_recalled_as_reference(self):
+        ticket = make_ticket(
+            equipment_type="VFD", description="变频器报警2310，输出过流，电机无法正常运行",
+        )
+        result = match_knowledge(ticket, {})
+        self.assertEqual(result["knowledge_match_level"], "REFERENCE")
+        self.assertIn("KB-ABB-ACS580-002", result["reference_knowledge_ids"])
+
+    def test_new_abb_overcurrent_entry_can_be_exact_for_confirmed_baseline(self):
+        ticket = make_ticket(
+            equipment_type="VFD", equipment_code="BASELINE-ABB-ACS580-001",
+            description="变频器报警2310，输出过流", alarm_code="2310",
+        )
+        result = match_knowledge(ticket, {})
+        self.assertEqual(result["knowledge_match_level"], "EXACT")
+        self.assertEqual(result["knowledge_ids"], ["KB-ABB-ACS580-002"])
+
+    def test_dorner_belt_tracking_is_reference_only(self):
+        ticket = make_ticket(
+            equipment_type="CONVEYOR", equipment_code="BASELINE-DORNER-001",
+            description="输送带皮带跑偏，无法保持居中",
+        )
+        result = match_knowledge(ticket, {})
+        self.assertEqual(result["knowledge_match_level"], "REFERENCE")
+        self.assertIn("KB-DORNER-2200-001", result["reference_knowledge_ids"])
+        self.assertEqual(result["knowledge_ids"], [])
+
 
 class UnifiedEntryTests(unittest.TestCase):
     def test_unified_entry_marks_human_for_reference(self):
@@ -96,16 +142,32 @@ class UnifiedEntryTests(unittest.TestCase):
         self.assertFalse(result["knowledge_pending"])
 
     def test_unified_entry_exact_no_force_human(self):
-        result = triage_ticket(
-            make_ticket(
-                equipment_type="CNC", equipment_code="BASELINE-VF2-001",
-                description="控制柜温度过高，风扇异常", alarm_code="253",
-                equipment_model="VF-2", operating_state="RUNNING",
-            ),
-            match_knowledge,
-        )
+        # 本例只验证知识精确匹配的行为；本地未验收模型文件不应改变测试结果。
+        with patch("app.services.triage_service.predict_category", return_value=None):
+            result = triage_ticket(
+                make_ticket(
+                    equipment_type="CNC", equipment_code="BASELINE-VF2-001",
+                    description="控制柜温度过高，风扇异常", alarm_code="253",
+                    equipment_model="VF-2", operating_state="RUNNING",
+                ),
+                match_knowledge,
+            )
         self.assertEqual(result["knowledge_match_level"], "EXACT")
         self.assertFalse(result["recommend_human"])
+
+    def test_unified_entry_unknown_state_requires_reference_and_human(self):
+        with patch("app.services.triage_service.predict_category", return_value=None):
+            result = triage_ticket(
+                make_ticket(
+                    equipment_type="CNC", equipment_code="BASELINE-VF2-001",
+                    description="控制柜温度过高，风扇异常", alarm_code="253",
+                    safety_risk="UNKNOWN",
+                ),
+                match_knowledge,
+            )
+        self.assertEqual(result["knowledge_match_level"], "REFERENCE")
+        self.assertTrue(result["recommend_human"])
+        self.assertIn("安全风险尚未确认", result["handoff_reasons"])
 
 
 if __name__ == "__main__":
