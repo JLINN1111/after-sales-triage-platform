@@ -6,7 +6,7 @@ from unittest.mock import patch
 from app.algorithms.classifier import predict_category, train_classifier
 from app.algorithms.dataset_split import split_by_case_family
 from app.services.triage_service import triage_ticket
-from app.algorithms.deidentification import find_sensitive_patterns
+from app.algorithms.deidentification import find_sensitive_patterns, redact_sensitive_patterns
 
 
 class ClassifierTests(unittest.TestCase):
@@ -108,3 +108,11 @@ class DeidentificationTests(unittest.TestCase):
     def test_detects_common_sensitive_patterns_without_returning_raw_value(self):
         found = find_sensitive_patterns("联系人电话13800138000，邮箱test@example.com")
         self.assertEqual(found, ["PHONE", "EMAIL"])
+
+    def test_redacts_detected_values_with_type_placeholders(self):
+        text, patterns = redact_sensitive_patterns("联系人13800138000，邮箱 service@example.com")
+        self.assertEqual(patterns, ["PHONE", "EMAIL"])
+        self.assertNotIn("13800138000", text)
+        self.assertNotIn("service@example.com", text)
+        self.assertIn("[PHONE_REDACTED]", text)
+        self.assertIn("[EMAIL_REDACTED]", text)

@@ -54,6 +54,38 @@ class LlmGuardTests(unittest.TestCase):
         self.assertEqual(captured["required_schema"]["reference_category"], "THERMAL_COOLING")
         self.assertIn("不使用 Markdown", captured["instruction"])
 
+    def test_redacts_phone_and_email_before_external_invoke(self):
+        captured = {}
+
+        def invoke(payload):
+            captured.update(payload)
+            return json.dumps({"reference_category": "THERMAL_COOLING", "customer_service_summary": "客服参考", "next_question": "请确认是否持续报警"})
+
+        result = guarded_llm_reference(
+            ticket(description="请联系13800138000或service@example.com，控制柜温度过高"),
+            rules(),
+            invoke,
+        )
+        self.assertEqual(result["status"], "REFERENCE")
+        self.assertNotIn("13800138000", captured["description"])
+        self.assertNotIn("service@example.com", captured["description"])
+        self.assertIn("[PHONE_REDACTED]", captured["description"])
+        self.assertIn("[EMAIL_REDACTED]", captured["description"])
+
+    def test_blocks_china_id_before_external_invoke(self):
+        called = False
+
+        def invoke(_):
+            nonlocal called
+            called = True
+            return "{}"
+
+        result = guarded_llm_reference(
+            ticket(description="身份证号110101199003071234，控制柜温度过高"), rules(), invoke
+        )
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertFalse(called)
+
     def test_provider_failure_is_blocked_without_propagating_error(self):
         result = guarded_llm_reference(ticket(), rules(), lambda _: (_ for _ in ()).throw(RuntimeError("network")))
         self.assertEqual(result["status"], "BLOCKED")

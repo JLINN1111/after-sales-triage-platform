@@ -4,6 +4,8 @@ import json
 from collections.abc import Callable, Mapping
 from typing import Any
 
+from app.algorithms.deidentification import redact_sensitive_patterns
+
 
 ALLOWED_CATEGORIES = {
     "ELECTRICAL_CONTROL", "MECHANICAL", "SENSOR_COMMUNICATION", "THERMAL_COOLING", "OTHER_UNKNOWN",
@@ -62,8 +64,17 @@ def guarded_llm_reference(
         return {"status": "BLOCKED", "reasons": preflight, "reference": None}
     if invoke is None:
         return {"status": "DISABLED", "reasons": ["未配置语言模型调用器"], "reference": None}
+    description, sensitive_types = redact_sensitive_patterns(
+        str(_ticket_value(ticket, "description") or "")
+    )
+    if "CHINA_ID" in sensitive_types:
+        return {
+            "status": "BLOCKED",
+            "reasons": ["描述含需人工处理的敏感身份信息，未调用语言模型"],
+            "reference": None,
+        }
     payload = {
-        "description": str(_ticket_value(ticket, "description") or ""),
+        "description": description,
         "rule_category": rules_result.get("predicted_category"),
         "instruction": (
             "只输出一个 JSON 对象，不使用 Markdown 代码块或额外字段。"
@@ -86,4 +97,7 @@ def guarded_llm_reference(
         return {"status": "BLOCKED", "reasons": ["语言模型输出不符合结构化安全约定"], "reference": None}
     if parsed["reference_category"] != rules_result.get("predicted_category"):
         return {"status": "BLOCKED", "reasons": ["语言模型与规则类别不一致"], "reference": None}
-    return {"status": "REFERENCE", "reasons": ["仅供客服参考，仍需人工确认"], "reference": parsed}
+    reasons = ["仅供客服参考，仍需人工确认"]
+    if sensitive_types:
+        reasons.append("已对描述中的可识别联系方式脱敏后发送")
+    return {"status": "REFERENCE", "reasons": reasons, "reference": parsed}
