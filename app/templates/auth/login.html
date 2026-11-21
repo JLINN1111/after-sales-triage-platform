@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}登录 - 售后报修智能分诊平台{% endblock %}
+
+{% block content %}
+<div class="page-card login-card">
+    <h1 class="page-title">平台登录</h1>
+    {% if no_account %}
+    <p class="alert alert-warning">尚未创建管理员账号。请在本机 .env 设置初始管理员账号与密码后，运行初始化数据库脚本。</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('auth.login') }}" class="ticket-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-field"><label for="username">账号</label><input id="username" name="username" autocomplete="username" required></div>
+        <div class="form-field"><label for="password">密码</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+        <div class="form-actions"><button type="submit" class="btn btn-primary">登录</button></div>
+    </form>
+</div>
+{% endblock %}

@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from app import create_app, db
-from app.models import Ticket, TicketAction
+from app.models import Ticket, TicketAction, User
 from app.services.ticket_actions import apply_ticket_action, initial_action_status
 
 
@@ -21,6 +21,7 @@ class TicketActionTests(unittest.TestCase):
             "LLM_ENABLED": False,
             "LLM_ALLOW_EXTERNAL_CALLS": False,
             "CSRF_ENABLED": False,
+            "AUTH_ENABLED": False,
         })
         with self.app.app_context():
             db.create_all()
@@ -400,6 +401,7 @@ class CsrfProtectionTests(unittest.TestCase):
             "SECRET_KEY": "csrf-test-secret",
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database}",
             "CSRF_ENABLED": True,
+            "AUTH_ENABLED": False,
         })
         with self.app.app_context():
             db.create_all()
@@ -435,6 +437,71 @@ class CsrfProtectionTests(unittest.TestCase):
             "submitter_note": "",
         })
         self.assertEqual(response.status_code, 302)
+
+
+class AccessControlTests(unittest.TestCase):
+    def setUp(self):
+        self.tempdir = tempfile.TemporaryDirectory()
+        database = Path(self.tempdir.name) / "access.db"
+        self.app = create_app({
+            "TESTING": True,
+            "SECRET_KEY": "access-test-secret",
+            "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database}",
+            "CSRF_ENABLED": True,
+            "AUTH_ENABLED": True,
+        })
+        with self.app.app_context():
+            db.create_all()
+            agent = User(username="agent01", role="AGENT", is_active=True)
+            agent.set_password("safe-test-password")
+            db.session.add(agent)
+            db.session.add(Ticket(
+                ticket_id="T-ACCESS-001", equipment_type="CNC",
+                description="控制柜温度过高，冷却风扇异常。", operating_state="RUNNING",
+                shutdown="NO", safety_risk="NO", alarm_code_status="PRESENT", alarm_code="253",
+                predicted_category="THERMAL_COOLING", priority="NORMAL", action_status="NEW",
+            ))
+            db.session.commit()
+
+    def tearDown(self):
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
+            db.engine.dispose()
+        self.tempdir.cleanup()
+
+    def login_agent(self, client):
+        page = client.get("/login")
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        response = client.post("/login", data={
+            "csrf_token": token, "username": "agent01", "password": "safe-test-password",
+        })
+        self.assertEqual(response.status_code, 302)
+
+    def test_login_required_for_ticket_list(self):
+        response = self.app.test_client().get("/tickets")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login", response.headers["Location"])
+
+    def test_agent_cannot_confirm_but_action_history_uses_logged_in_account(self):
+        client = self.app.test_client()
+        self.login_agent(client)
+        detail = client.get("/tickets/T-ACCESS-001")
+        token = re.search(rb'<meta name="csrf-token" content="([^"]+)"', detail.data).group(1).decode()
+        denied = client.post(
+            "/tickets/T-ACCESS-001/actions",
+            json={"action_type": "CONFIRM", "action_by": "forged", "confirmed_category": "THERMAL_COOLING", "confirmed_priority": "NORMAL"},
+            headers={"X-CSRF-Token": token},
+        )
+        self.assertEqual(denied.status_code, 403)
+        allowed = client.post(
+            "/tickets/T-ACCESS-001/actions",
+            json={"action_type": "FOLLOW_UP", "action_by": "forged", "customer_follow_up": "请补充设备型号。"},
+            headers={"X-CSRF-Token": token},
+        )
+        self.assertEqual(allowed.status_code, 200)
+        with self.app.app_context():
+            self.assertEqual(TicketAction.query.one().action_by, "agent01")
 
 
 if __name__ == "__main__":

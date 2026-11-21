@@ -12,8 +12,15 @@
         <div class="header-inner">
             <a class="site-title" href="{{ url_for('tickets.list_tickets') }}">售后报修智能分诊平台</a>
             <nav class="site-nav">
-                <a href="{{ url_for('tickets.new_ticket') }}">提交报修</a>
-                <a href="{{ url_for('tickets.list_tickets') }}">工单列表</a>
+                {% if current_user %}
+                    {% if can('ticket:submit') %}<a href="{{ url_for('tickets.new_ticket') }}">提交报修</a>{% endif %}
+                    <a href="{{ url_for('tickets.list_tickets') }}">工单列表</a>
+                    <span>{{ current_user.username }}（{{ role_labels.get(current_user.role, current_user.role) }}）</span>
+                    <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn-link">退出</button>
+                    </form>
+                {% endif %}
             </nav>
         </div>
     </header>

@@ -15,13 +15,24 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app import create_app, db
-from app.models import Ticket, TicketAction  # noqa: F401  导入模型，建表时才能找到它
+from app.models import Ticket, TicketAction, User  # noqa: F401  导入模型，建表时才能找到它
 
 
 def init_database():
     app = create_app()
     with app.app_context():
         db.create_all()
+        if User.query.count() == 0:
+            username = app.config["BOOTSTRAP_ADMIN_USERNAME"].strip()
+            password = app.config["BOOTSTRAP_ADMIN_PASSWORD"]
+            if username and password:
+                admin = User(username=username, role="ADMIN", is_active=True)
+                admin.set_password(password)
+                db.session.add(admin)
+                db.session.commit()
+                print(f"已创建初始平台管理员账号：{username}")
+            else:
+                print("尚未创建管理员账号：请先在本机 .env 设置 BOOTSTRAP_ADMIN_USERNAME 和 BOOTSTRAP_ADMIN_PASSWORD 后再次运行本脚本。")
         print("数据库初始化完成，表已就绪。")
 
 

@@ -18,6 +18,7 @@ from app.services.llm_guard import guarded_llm_reference
 from app.services.llm_provider import configured_llm_invoke
 from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
 from app.services.triage_service import triage_ticket
+from app.services.access_control import action_permission_required, current_user, login_required, permission_required
 
 tickets_bp = Blueprint("tickets", __name__)
 
@@ -179,7 +180,7 @@ def llm_cooldown_remaining(ticket):
     return 0
 
 
-def record_llm_reference_audit(ticket, result):
+def record_llm_reference_audit(ticket, result, action_by="SYSTEM"):
     """保留不含描述、模型原文或密钥的最小审计事件。"""
     status = result.get("status", "UNKNOWN")
     reasons = [str(reason) for reason in result.get("reasons", [])]
@@ -191,7 +192,7 @@ def record_llm_reference_audit(ticket, result):
         old_values={},
         new_values={"llm_status": status, "reason_codes": reasons},
         action_note="已记录大模型客服参考调用，不保存外发描述或模型原文。",
-        action_by="SYSTEM",
+        action_by=action_by,
         action_at=datetime.now(),
     ))
     db.session.commit()
@@ -254,6 +255,8 @@ def validate(form):
 
 
 @tickets_bp.route("/tickets/new", methods=["GET", "POST"])
+@login_required
+@permission_required("ticket:submit")
 def new_ticket():
     if request.method == "GET":
         return render_template("tickets/form.html", form=default_form(), errors=[])
@@ -286,12 +289,16 @@ def new_ticket():
 
 
 @tickets_bp.route("/tickets")
+@login_required
+@permission_required("ticket:view")
 def list_tickets():
     tickets = Ticket.query.order_by(Ticket.created_at.desc()).all()
     return render_template("tickets/list.html", tickets=tickets, display=DISPLAY)
 
 
 @tickets_bp.route("/tickets/<ticket_id>/delete", methods=["POST"])
+@login_required
+@permission_required("ticket:delete")
 def delete_ticket(ticket_id):
     """删除一张工单；仅接受 POST，避免误操作与搜索引擎抓取触发。"""
     ticket = Ticket.query.get_or_404(ticket_id)
@@ -302,10 +309,15 @@ def delete_ticket(ticket_id):
 
 
 @tickets_bp.route("/tickets/<ticket_id>/actions", methods=["POST"])
+@login_required
+@action_permission_required
 def ticket_action(ticket_id):
     """接收客服补问、转人工、确认、修订或关闭操作并保存留痕。"""
     ticket = Ticket.query.get_or_404(ticket_id)
     payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
+    payload = dict(payload or {})
+    if current_user() is not None:
+        payload["action_by"] = current_user().username
     try:
         action = apply_ticket_action(ticket, payload or {})
     except ValueError as error:
@@ -331,6 +343,8 @@ def ticket_action(ticket_id):
 
 
 @tickets_bp.route("/tickets/<ticket_id>/llm-reference", methods=["POST"])
+@login_required
+@permission_required("llm:reference")
 def llm_reference(ticket_id):
     """仅在客服显式发起时请求外部模型；结果不写回分诊或工单状态。"""
     ticket = Ticket.query.get_or_404(ticket_id)
@@ -346,11 +360,14 @@ def llm_reference(ticket_id):
         result = guarded_llm_reference(
             ticket, rules_result, configured_llm_invoke(current_app.config),
         )
-    record_llm_reference_audit(ticket, result)
+    user = current_user()
+    record_llm_reference_audit(ticket, result, action_by=user.username if user else "SYSTEM")
     return jsonify({"ticket_id": ticket.ticket_id, **result}), 200
 
 
 @tickets_bp.route("/tickets/<ticket_id>")
+@login_required
+@permission_required("ticket:view")
 def ticket_detail(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     match_level = ticket.knowledge_match_level

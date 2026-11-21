@@ -15,6 +15,9 @@ def create_app(config_overrides=None):
         app.config.update(config_overrides)
     db.init_app(app)
 
+    from app.models import User  # noqa: F401  确保初始化数据库时包含账户表。
+    from app.services.access_control import init_access_control
+
     def csrf_token():
         token = session.get("csrf_token")
         if not token:
@@ -38,11 +41,15 @@ def create_app(config_overrides=None):
             abort(400, description="请求校验失败，请刷新页面后重试。")
         return None
 
+    init_access_control(app)
+
     @app.get("/")
     def index():
         return redirect(url_for("tickets.list_tickets"))
 
+    from app.routes.auth import auth_bp
     from app.routes.tickets import tickets_bp
+    app.register_blueprint(auth_bp)
     app.register_blueprint(tickets_bp)
 
     return app
