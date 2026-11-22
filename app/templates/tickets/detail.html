@@ -39,7 +39,6 @@
         {% if handoff_zh %}
         <tr><th>转人工原因</th><td>{{ handoff_zh | join('；') }}</td></tr>
         {% endif %}
-        <tr><th>算法版本</th><td>{{ ticket.model_version or '-' }}</td></tr>
     </table>
     {% endif %}
 
@@ -289,18 +288,18 @@
     <p class="page-hint"><strong>{{ match_zh[0] }}</strong>：{{ match_zh[1] }}</p>
     {% if exact_items %}
     <table class="detail-table">
-        <tr><th>知识编号</th><th>资料名称</th><th>处置方向（原厂）</th><th>来源</th></tr>
+        <tr><th>资料名称</th><th>处置方向（原厂）</th><th>来源</th></tr>
         {% for item in exact_items %}
-        <tr><td>{{ item.id }}</td><td>{{ item.title }}</td><td>{{ item.summary }}</td><td>{{ item.source }}</td></tr>
+        <tr><td>{{ item.title }}</td><td>{{ item.summary }}</td><td>{{ item.source }}</td></tr>
         {% endfor %}
     </table>
     {% endif %}
     {% if reference_items %}
     <p class="page-hint">以下为同类设备参考条目，仅供核对，不能作为确定结论：</p>
     <table class="detail-table">
-        <tr><th>知识编号</th><th>资料名称</th><th>处置方向（参考）</th><th>来源</th></tr>
+        <tr><th>资料名称</th><th>处置方向（参考）</th><th>来源</th></tr>
         {% for item in reference_items %}
-        <tr><td>{{ item.id }}</td><td>{{ item.title }}</td><td>{{ item.summary }}</td><td>{{ item.source }}</td></tr>
+        <tr><td>{{ item.title }}</td><td>{{ item.summary }}</td><td>{{ item.source }}</td></tr>
         {% endfor %}
     </table>
     {% endif %}
