@@ -5,12 +5,10 @@ from types import SimpleNamespace
 from typing import Any
 
 from app.algorithms.rules import triage_ticket as run_rules
-from app.algorithms.classifier import predict_category
 
 
 KnowledgeMatcher = Callable[[Mapping[str, Any] | Any, Mapping[str, Any]], Mapping[str, Any]]
 _MATCH_LEVELS = {"EXACT", "REFERENCE", "NONE"}
-MODEL_REVIEW_THRESHOLD = 0.70
 SUPPLEMENT_FIELDS = (
     "equipment_model", "equipment_code", "operating_state", "shutdown",
     "safety_risk", "alarm_code_status", "alarm_code",
@@ -84,21 +82,6 @@ def triage_ticket(
 
     ticket_for_triage = effective_ticket(ticket)
     result = run_rules(ticket_for_triage)
-    prediction = predict_category(str(getattr(ticket_for_triage, "description", "") if not isinstance(ticket_for_triage, Mapping) else ticket_for_triage.get("description", "")))
-    if prediction:
-        result["category_confidence"] = prediction["confidence"]
-        result["model_version"] = f"{result['model_version']}+{prediction['model_version']}"
-        if result["predicted_category"] == "OTHER_UNKNOWN" and prediction["confidence"] >= MODEL_REVIEW_THRESHOLD:
-            result["predicted_category"] = prediction["category"]
-            _append_once(result["evidence_codes"], f"MODEL-CATEGORY:{prediction['category']}")
-        elif prediction["confidence"] < MODEL_REVIEW_THRESHOLD:
-            result["recommend_human"] = True
-            _append_once(result["handoff_reasons"], "分类模型置信度不足")
-            _append_once(result["evidence_codes"], "MODEL-LOW-CONFIDENCE")
-        elif result["predicted_category"] != prediction["category"]:
-            result["recommend_human"] = True
-            _append_once(result["handoff_reasons"], "规则与分类模型结果不一致")
-            _append_once(result["evidence_codes"], "MODEL-RULE-CONFLICT")
     result.update(_knowledge_defaults())
 
     if knowledge_matcher is not None:

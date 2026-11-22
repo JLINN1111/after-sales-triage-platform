@@ -128,7 +128,6 @@ def triage_ticket(ticket: Mapping[str, Any] | Any) -> dict[str, Any]:
     return {
         "symptom_tags": symptom_tags,
         "predicted_category": predicted_category,
-        "category_confidence": None,
         "priority": priority,
         "evidence_codes": evidence_codes,
         "missing_fields": missing_fields,

@@ -1,7 +1,4 @@
 Flask
 Flask-SQLAlchemy
-pandas
-scikit-learn
-jieba
 python-dotenv
 

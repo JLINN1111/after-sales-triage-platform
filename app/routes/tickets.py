@@ -9,13 +9,11 @@
 
 from datetime import datetime
 
-from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
 
 from app import db
 from app.models import Ticket, TicketAction, TicketOutcome
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
-from app.services.llm_guard import guarded_llm_reference
-from app.services.llm_provider import configured_llm_invoke
 from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
 from app.services.triage_service import triage_ticket
 from app.services.access_control import action_permission_required, current_user, login_required, permission_required
@@ -50,7 +48,6 @@ DISPLAY = {
     "action": {
         "FOLLOW_UP": "补问信息", "HANDOFF": "转人工处理", "CONFIRM": "确认分诊",
         "SUPPLEMENT": "录入客户补充信息", "EDIT": "修订确认结果", "CLOSE": "关闭工单",
-        "LLM_REFERENCE": "大模型客服参考调用",
     },
     "action_status": {
         "NEW": "待处理", "NEED_INFO": "待补充信息", "HUMAN_REVIEW": "人工复核中",
@@ -135,16 +132,11 @@ def action_detail(action):
         if action.action_note:
             parts.append(f"说明：{action.action_note}")
         return "；".join(parts) or "-"
-    if action.action_type == "LLM_REFERENCE":
-        values = action.new_values or {}
-        status = values.get("llm_status", "UNKNOWN")
-        reasons = values.get("reason_codes", [])
-        return f"调用状态：{status}；" + "；".join(reasons or ["未记录原因"])
     return action.action_note or "-"
 
 # 统一分诊结果写回工单的字段（triaged_at 是字符串，需转 datetime）
 RESULT_FIELDS = [
-    "symptom_tags", "predicted_category", "category_confidence", "priority",
+    "symptom_tags", "predicted_category", "priority",
     "evidence_codes", "missing_fields", "follow_up_questions",
     "knowledge_ids", "reference_knowledge_ids", "knowledge_match_level",
     "recommend_human", "handoff_reasons", "model_version", "triaged_at",
@@ -164,38 +156,6 @@ def apply_triage(ticket):
     ticket.action_status = initial_action_status(result)
     return result
 
-
-def llm_cooldown_remaining(ticket):
-    """仅限制已成功生成参考的重复外发；阻断或失败不占用冷却时间。"""
-    cooldown = max(0, int(current_app.config.get("LLM_REFERENCE_COOLDOWN_SECONDS", 60)))
-    if not cooldown:
-        return 0
-    for action in reversed(ticket.actions):
-        if action.action_type != "LLM_REFERENCE":
-            continue
-        if (action.new_values or {}).get("llm_status") != "REFERENCE":
-            continue
-        elapsed = (datetime.now() - action.action_at).total_seconds()
-        return max(0, int(cooldown - elapsed))
-    return 0
-
-
-def record_llm_reference_audit(ticket, result, action_by="SYSTEM"):
-    """保留不含描述、模型原文或密钥的最小审计事件。"""
-    status = result.get("status", "UNKNOWN")
-    reasons = [str(reason) for reason in result.get("reasons", [])]
-    db.session.add(TicketAction(
-        ticket=ticket,
-        action_type="LLM_REFERENCE",
-        state_before=ticket.action_status,
-        state_after=ticket.action_status,
-        old_values={},
-        new_values={"llm_status": status, "reason_codes": reasons},
-        action_note="已记录大模型客服参考调用，不保存外发描述或模型原文。",
-        action_by=action_by,
-        action_at=datetime.now(),
-    ))
-    db.session.commit()
 
 TRI_STATE = {"YES", "NO", "UNKNOWN"}
 ALARM_STATUS = {"PRESENT", "NONE", "UNKNOWN"}
@@ -342,29 +302,6 @@ def ticket_action(ticket_id):
     return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
 
 
-@tickets_bp.route("/tickets/<ticket_id>/llm-reference", methods=["POST"])
-@login_required
-@permission_required("llm:reference")
-def llm_reference(ticket_id):
-    """仅在客服显式发起时请求外部模型；结果不写回分诊或工单状态。"""
-    ticket = Ticket.query.get_or_404(ticket_id)
-    remaining = llm_cooldown_remaining(ticket)
-    if remaining:
-        result = {
-            "status": "BLOCKED",
-            "reasons": [f"同一工单已生成客服参考，请在 {remaining} 秒后再试"],
-            "reference": None,
-        }
-    else:
-        rules_result = triage_ticket(ticket, match_knowledge)
-        result = guarded_llm_reference(
-            ticket, rules_result, configured_llm_invoke(current_app.config),
-        )
-    user = current_user()
-    record_llm_reference_audit(ticket, result, action_by=user.username if user else "SYSTEM")
-    return jsonify({"ticket_id": ticket.ticket_id, **result}), 200
-
-
 @tickets_bp.post("/tickets/<ticket_id>/outcomes")
 @login_required
 @permission_required("outcome:record")
@@ -399,20 +336,6 @@ def ticket_detail(ticket_id):
     match_level = ticket.knowledge_match_level
     has_handoff = any(action.action_type == "HANDOFF" for action in ticket.actions)
     action_details = {action.id: action_detail(action) for action in ticket.actions}
-    llm_block_reasons = []
-    if ticket.safety_risk in {"YES", "UNKNOWN"}:
-        llm_block_reasons.append("安全风险需要人工确认，未调用大模型。")
-    if ticket.shutdown in {"YES", "UNKNOWN"}:
-        llm_block_reasons.append("停机状态需要人工确认，未调用大模型。")
-    if ticket.recommend_human:
-        llm_block_reasons.append("系统已要求人工确认，未调用大模型。")
-    if ticket.follow_up_questions:
-        llm_block_reasons.append("关键信息尚未补全，未调用大模型。")
-    llm_configured = (
-        bool(current_app.config.get("LLM_ENABLED"))
-        and bool(current_app.config.get("LLM_ALLOW_EXTERNAL_CALLS"))
-        and current_app.config.get("LLM_PROVIDER") == "deepseek"
-    )
     return render_template(
         "tickets/detail.html",
         ticket=ticket,
@@ -429,7 +352,5 @@ def ticket_detail(ticket_id):
         has_handoff=has_handoff,
         action_details=action_details,
         action_note_required=(ticket.action_status == "HUMAN_REVIEW" or needs_handoff_before_close(ticket)),
-        llm_block_reasons=list(dict.fromkeys(llm_block_reasons)),
-        llm_configured=llm_configured,
         resolution_status_zh={"RESOLVED": "已解决", "PARTIALLY_RESOLVED": "部分解决", "UNRESOLVED": "未解决", "UNKNOWN": "暂不确定"},
     )

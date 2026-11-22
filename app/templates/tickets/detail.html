@@ -43,58 +43,6 @@
     </table>
     {% endif %}
 
-    <h2 class="section-title">DeepSeek 客服参考</h2>
-    <p class="page-hint">仅生成客服摘要和下一步补问建议，不改变分诊结论、优先级、工单状态或维修知识。</p>
-    {% if llm_block_reasons %}
-    <p class="alert alert-warning">{{ llm_block_reasons | join('；') }}</p>
-    {% elif not llm_configured %}
-    <p class="page-hint">DeepSeek 尚未在本机启用，当前不会发送任何外部请求。</p>
-    {% else %}
-    <div class="llm-reference-panel">
-        <button type="button" id="llm-reference-button" class="btn btn-secondary" data-url="{{ url_for('tickets.llm_reference', ticket_id=ticket.ticket_id) }}">生成客服摘要与补问建议</button>
-        <p class="page-hint llm-reference-note">仅供人工客服参考，不能替代分诊、现场诊断或安全判断。</p>
-        <div id="llm-reference-result" class="llm-reference-result" hidden aria-live="polite"></div>
-    </div>
-    <script>
-    (() => {
-        const button = document.getElementById("llm-reference-button");
-        const result = document.getElementById("llm-reference-result");
-        if (!button || !result) return;
-        button.addEventListener("click", async () => {
-            button.disabled = true;
-            button.textContent = "正在生成参考…";
-            result.hidden = false;
-            result.replaceChildren();
-            try {
-                const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                const response = await fetch(button.dataset.url, {method: "POST", headers: {"Accept": "application/json", "X-CSRF-Token": csrfToken}});
-                const data = await response.json();
-                if (data.status !== "REFERENCE" || !data.reference) {
-                    const message = (data.reasons && data.reasons[0]) || "未获得参考，请按人工流程处理。";
-                    result.textContent = message;
-                    result.className = "llm-reference-result alert alert-warning";
-                    return;
-                }
-                const title = document.createElement("strong");
-                title.textContent = "仅供人工客服参考";
-                const summary = document.createElement("p");
-                summary.textContent = "客服摘要：" + data.reference.customer_service_summary;
-                const question = document.createElement("p");
-                question.textContent = "建议补问：" + data.reference.next_question;
-                result.replaceChildren(title, summary, question);
-                result.className = "llm-reference-result alert alert-success";
-            } catch (_) {
-                result.textContent = "未获得参考，请按人工流程处理。";
-                result.className = "llm-reference-result alert alert-warning";
-            } finally {
-                button.disabled = false;
-                button.textContent = "重新生成客服摘要与补问建议";
-            }
-        });
-    })();
-    </script>
-    {% endif %}
-
     <h2 class="section-title">客服处理</h2>
     <p class="page-hint">当前处理状态：<span class="status-badge">{{ display.action_status.get(ticket.action_status, ticket.action_status) }}</span></p>
     {% if ticket.action_status == 'HUMAN_REVIEW' %}
@@ -306,7 +254,7 @@
     {% endif %}
 
     <h2 class="section-title">处理结果反馈</h2>
-    <p class="page-hint">仅复核主管或管理员可记录。反馈先作为待审核业务数据来源，不会自动进入模型训练或改变当前分诊结果。</p>
+    <p class="page-hint">仅复核主管或管理员可记录。反馈作为业务处理记录保存，不会自动改变当前分诊结果。</p>
     {% if can('outcome:record') and ticket.action_status in ['CONFIRMED', 'CLOSED'] %}
     <form method="post" action="{{ url_for('tickets.record_outcome', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

@@ -4,7 +4,6 @@
 """
 
 import unittest
-from unittest.mock import patch
 
 from app.services.knowledge_matcher import match_knowledge
 from app.services.triage_service import triage_ticket
@@ -142,29 +141,27 @@ class UnifiedEntryTests(unittest.TestCase):
         self.assertFalse(result["knowledge_pending"])
 
     def test_unified_entry_exact_no_force_human(self):
-        # 本例只验证知识精确匹配的行为；本地未验收模型文件不应改变测试结果。
-        with patch("app.services.triage_service.predict_category", return_value=None):
-            result = triage_ticket(
-                make_ticket(
-                    equipment_type="CNC", equipment_code="BASELINE-VF2-001",
-                    description="控制柜温度过高，风扇异常", alarm_code="253",
-                    equipment_model="VF-2", operating_state="RUNNING",
-                ),
-                match_knowledge,
-            )
+        # 本例只验证知识精确匹配的行为。
+        result = triage_ticket(
+            make_ticket(
+                equipment_type="CNC", equipment_code="BASELINE-VF2-001",
+                description="控制柜温度过高，风扇异常", alarm_code="253",
+                equipment_model="VF-2", operating_state="RUNNING",
+            ),
+            match_knowledge,
+        )
         self.assertEqual(result["knowledge_match_level"], "EXACT")
         self.assertFalse(result["recommend_human"])
 
     def test_unified_entry_unknown_state_requires_reference_and_human(self):
-        with patch("app.services.triage_service.predict_category", return_value=None):
-            result = triage_ticket(
-                make_ticket(
-                    equipment_type="CNC", equipment_code="BASELINE-VF2-001",
-                    description="控制柜温度过高，风扇异常", alarm_code="253",
-                    safety_risk="UNKNOWN",
-                ),
-                match_knowledge,
-            )
+        result = triage_ticket(
+            make_ticket(
+                equipment_type="CNC", equipment_code="BASELINE-VF2-001",
+                description="控制柜温度过高，风扇异常", alarm_code="253",
+                safety_risk="UNKNOWN",
+            ),
+            match_knowledge,
+        )
         self.assertEqual(result["knowledge_match_level"], "REFERENCE")
         self.assertTrue(result["recommend_human"])
         self.assertIn("安全风险尚未确认", result["handoff_reasons"])

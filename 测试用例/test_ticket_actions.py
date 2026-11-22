@@ -4,10 +4,9 @@ import tempfile
 import unittest
 import re
 from pathlib import Path
-from unittest.mock import patch
 
 from app import create_app, db
-from app.models import Ticket, TicketAction, TicketOutcome, TicketOutcomeReview, TrainingCandidateReview, User
+from app.models import Ticket, TicketAction, TicketOutcome, User
 from app.services.ticket_actions import apply_ticket_action, initial_action_status
 
 
@@ -18,8 +17,6 @@ class TicketActionTests(unittest.TestCase):
         self.app = create_app({
             "TESTING": True,
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///{database}",
-            "LLM_ENABLED": False,
-            "LLM_ALLOW_EXTERNAL_CALLS": False,
             "CSRF_ENABLED": False,
             "AUTH_ENABLED": False,
         })
@@ -175,80 +172,6 @@ class TicketActionTests(unittest.TestCase):
         })
         self.assertEqual(response.status_code, 400)
         self.assertIn("当前状态不允许", response.get_json()["error"])
-
-    def test_llm_reference_endpoint_is_disabled_without_explicit_enablement(self):
-        safe_rules_result = {
-            "predicted_category": "THERMAL_COOLING",
-            "recommend_human": False,
-            "missing_fields": [],
-        }
-        with patch("app.routes.tickets.triage_ticket", return_value=safe_rules_result):
-            response = self.app.test_client().post("/tickets/T-ACTION-001/llm-reference")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json()["status"], "DISABLED")
-        self.assertIsNone(response.get_json()["reference"])
-        with self.app.app_context():
-            audit = TicketAction.query.filter_by(action_type="LLM_REFERENCE").one()
-            self.assertEqual(audit.action_by, "SYSTEM")
-            self.assertEqual(audit.new_values["llm_status"], "DISABLED")
-            self.assertNotIn(self.get_ticket().description, str(audit.new_values))
-
-    def test_llm_reference_success_has_per_ticket_cooldown_and_safe_audit(self):
-        self.app.config.update(
-            LLM_ENABLED=True,
-            LLM_ALLOW_EXTERNAL_CALLS=True,
-            LLM_PROVIDER="deepseek",
-            LLM_REFERENCE_COOLDOWN_SECONDS=60,
-        )
-        safe_rules_result = {
-            "predicted_category": "THERMAL_COOLING",
-            "recommend_human": False,
-            "missing_fields": [],
-        }
-        reference = {
-            "status": "REFERENCE",
-            "reasons": ["仅供客服参考，仍需人工确认"],
-            "reference": {"reference_category": "THERMAL_COOLING"},
-        }
-        with patch("app.routes.tickets.triage_ticket", return_value=safe_rules_result), patch(
-            "app.routes.tickets.guarded_llm_reference", return_value=reference
-        ) as guarded:
-            client = self.app.test_client()
-            first = client.post("/tickets/T-ACTION-001/llm-reference")
-            second = client.post("/tickets/T-ACTION-001/llm-reference")
-        self.assertEqual(first.get_json()["status"], "REFERENCE")
-        self.assertEqual(second.get_json()["status"], "BLOCKED")
-        self.assertEqual(guarded.call_count, 1)
-        with self.app.app_context():
-            audits = TicketAction.query.filter_by(action_type="LLM_REFERENCE").all()
-            self.assertEqual([item.new_values["llm_status"] for item in audits], ["REFERENCE", "BLOCKED"])
-            self.assertTrue(all(self.get_ticket().description not in str(item.new_values) for item in audits))
-
-    def test_detail_explains_when_deepseek_is_not_enabled(self):
-        response = self.app.test_client().get("/tickets/T-ACTION-001")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("DeepSeek 客服参考".encode("utf-8"), response.data)
-        self.assertIn("尚未在本机启用".encode("utf-8"), response.data)
-        self.assertNotIn(b"llm-reference-button", response.data)
-
-    def test_detail_shows_manual_deepseek_button_only_when_eligible(self):
-        self.app.config.update(LLM_ENABLED=True, LLM_ALLOW_EXTERNAL_CALLS=True, LLM_PROVIDER="deepseek")
-        response = self.app.test_client().get("/tickets/T-ACTION-001")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"llm-reference-button", response.data)
-        self.assertIn("仅供人工客服参考".encode("utf-8"), response.data)
-
-    def test_detail_hides_deepseek_button_for_safety_risk(self):
-        self.app.config.update(LLM_ENABLED=True, LLM_ALLOW_EXTERNAL_CALLS=True, LLM_PROVIDER="deepseek")
-        with self.app.app_context():
-            ticket = self.get_ticket()
-            ticket.safety_risk = "YES"
-            ticket.recommend_human = True
-            db.session.commit()
-        response = self.app.test_client().get("/tickets/T-ACTION-001")
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn(b"llm-reference-button", response.data)
-        self.assertIn("安全风险需要人工确认".encode("utf-8"), response.data)
 
     def test_detail_displays_action_history(self):
         with self.app.app_context():
@@ -551,84 +474,6 @@ class AccessControlTests(unittest.TestCase):
         self.assertEqual(saved.status_code, 302)
         with self.app.app_context():
             self.assertEqual(TicketOutcome.query.one().recorded_by, "reviewer02")
-
-    def test_admin_reviews_outcome_once_without_training_model(self):
-        with self.app.app_context():
-            ticket = db.session.get(Ticket, "T-ACCESS-001")
-            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="RESOLVED", resolution_note="现场确认冷却风扇更换后恢复正常。", recorded_by="reviewer02")
-            db.session.add(outcome)
-            db.session.commit()
-            outcome_id = outcome.id
-        client = self.app.test_client()
-        self.login(client, "admin01", "admin-test-password")
-        page = client.get("/admin/outcomes")
-        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
-        response = client.post(f"/admin/outcomes/{outcome_id}/review", data={"csrf_token": token, "decision": "APPROVED", "review_note": "已核对处理依据，允许进入后续训练候选审核。"})
-        self.assertEqual(response.status_code, 302)
-        with self.app.app_context():
-            review = TicketOutcomeReview.query.one()
-            self.assertEqual(review.decision, "APPROVED")
-            self.assertEqual(review.reviewed_by, "admin01")
-        repeated = client.post(f"/admin/outcomes/{outcome_id}/review", data={"csrf_token": token, "decision": "REJECTED", "review_note": "重复审核不应覆盖已有结论。"})
-        self.assertEqual(repeated.status_code, 302)
-        with self.app.app_context():
-            self.assertEqual(TicketOutcomeReview.query.count(), 1)
-
-    def test_admin_can_accept_training_candidate_once(self):
-        with self.app.app_context():
-            ticket = db.session.get(Ticket, "T-ACCESS-001")
-            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="RESOLVED", resolution_note="现场确认冷却风扇更换后恢复正常。", recorded_by="reviewer02")
-            db.session.add(outcome); db.session.commit()
-            review = TicketOutcomeReview(outcome=outcome, decision="APPROVED", review_note="允许进入后续训练候选审核。", reviewed_by="admin01")
-            db.session.add(review); db.session.commit(); review_id = review.id
-        client = self.app.test_client(); self.login(client, "admin01", "admin-test-password")
-        page = client.get("/admin/training-candidates")
-        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
-        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "data_scope": "COURSE_SYNTHETIC", "case_family_id": "COURSE-THERMAL-001", "review_note": "文本和类别经人工复核，可作为正式样本候选。"})
-        self.assertEqual(response.status_code, 302)
-        with self.app.app_context():
-            candidate = TrainingCandidateReview.query.one()
-            self.assertEqual(candidate.decision, "ACCEPTED")
-            self.assertEqual(candidate.reviewed_category, "THERMAL_COOLING")
-            self.assertEqual(candidate.case_family_id, "COURSE-THERMAL-001")
-        repeated = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "REJECTED", "review_note": "重复审核不得覆盖已经完成的样本结论。"})
-        self.assertEqual(repeated.status_code, 302)
-        with self.app.app_context():
-            self.assertEqual(TrainingCandidateReview.query.count(), 1)
-
-    def test_training_candidate_page_redacts_description_and_allows_category_revision(self):
-        with self.app.app_context():
-            ticket = db.session.get(Ticket, "T-ACCESS-001")
-            ticket.description = "请联系13800138000，控制柜风扇异常。"
-            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="RESOLVED", resolution_note="现场确认风扇更换后恢复正常。", recorded_by="reviewer02")
-            review = TicketOutcomeReview(outcome=outcome, decision="APPROVED", review_note="允许进入后续训练候选审核。", reviewed_by="admin01")
-            db.session.add_all([outcome, review]); db.session.commit(); review_id = review.id
-        client = self.app.test_client(); self.login(client, "admin01", "admin-test-password")
-        page = client.get("/admin/training-candidates")
-        self.assertNotIn(b"13800138000", page.data)
-        self.assertIn(b"[PHONE_REDACTED]", page.data)
-        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
-        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "MECHANICAL", "data_scope": "COURSE_SYNTHETIC", "case_family_id": "COURSE-MECHANICAL-001", "review_note": "人工复核后修订类别，可作为正式样本候选。"})
-        self.assertEqual(response.status_code, 302)
-        with self.app.app_context():
-            self.assertEqual(TrainingCandidateReview.query.one().reviewed_category, "MECHANICAL")
-
-    def test_training_candidate_review_requires_admin_and_eligible_feedback(self):
-        with self.app.app_context():
-            ticket = db.session.get(Ticket, "T-ACCESS-001")
-            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="PENDING", resolution_note="尚待现场确认。", recorded_by="reviewer02")
-            review = TicketOutcomeReview(outcome=outcome, decision="APPROVED", review_note="允许进入后续训练候选审核。", reviewed_by="admin01")
-            db.session.add_all([outcome, review]); db.session.commit(); review_id = review.id
-        agent = self.app.test_client(); self.login_agent(agent)
-        self.assertEqual(agent.get("/admin/training-candidates").status_code, 302)
-        admin = self.app.test_client(); self.login(admin, "admin01", "admin-test-password")
-        page = admin.get("/admin/training-candidates")
-        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
-        response = admin.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "data_scope": "COURSE_SYNTHETIC", "case_family_id": "COURSE-THERMAL-001", "review_note": "不满足条件的反馈不得形成训练候选审核。"})
-        self.assertEqual(response.status_code, 302)
-        with self.app.app_context():
-            self.assertEqual(TrainingCandidateReview.query.count(), 0)
-
 
 if __name__ == "__main__":
     unittest.main()
