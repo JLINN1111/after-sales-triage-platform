@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app import create_app, db
-from app.models import Ticket, TicketAction, TicketOutcome, TicketOutcomeReview, User  # noqa: F401  导入模型，建表时才能找到它
+from app.models import Ticket, TicketAction, TicketOutcome, TicketOutcomeReview, TrainingCandidateReview, User  # noqa: F401  导入模型，建表时才能找到它
 
 
 def init_database():

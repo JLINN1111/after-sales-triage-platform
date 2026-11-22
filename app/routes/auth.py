@@ -3,8 +3,12 @@ import re
 from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
 
 from app import db
-from app.models import User, TicketOutcome, TicketOutcomeReview
+from app.models import User, TicketOutcome, TicketOutcomeReview, TrainingCandidateReview
 from app.services.access_control import ROLE_LABELS, login_required, permission_required, current_user
+from app.services.feedback_export import candidate_from_outcome
+
+
+TRAINING_CATEGORIES = ["ELECTRICAL_CONTROL", "MECHANICAL", "THERMAL_COOLING", "SENSOR_COMMUNICATION", "OTHER_UNKNOWN"]
 
 
 auth_bp = Blueprint("auth", __name__)
@@ -144,3 +148,36 @@ def review_outcome(outcome_id):
         db.session.commit()
         flash("已完成反馈审核。批准项仅作为后续训练候选，不会自动训练。")
     return redirect(url_for("auth.outcome_review_list"))
+
+
+@auth_bp.get("/admin/training-candidates")
+@login_required
+@permission_required("outcome:approve")
+def training_candidate_list():
+    reviews = TicketOutcomeReview.query.filter_by(decision="APPROVED").order_by(TicketOutcomeReview.reviewed_at.desc()).all()
+    candidates = []
+    for review in reviews:
+        candidate, _reason = candidate_from_outcome(review.outcome)
+        if candidate:
+            candidates.append({"review": review, "candidate": candidate, "sample_review": TrainingCandidateReview.query.filter_by(outcome_review_id=review.id).first()})
+    return render_template("auth/training_candidates.html", candidates=candidates, categories=TRAINING_CATEGORIES)
+
+
+@auth_bp.post("/admin/training-candidates/<int:review_id>")
+@login_required
+@permission_required("outcome:approve")
+def review_training_candidate(review_id):
+    review = db.get_or_404(TicketOutcomeReview, review_id)
+    decision = request.form.get("decision", "")
+    category = request.form.get("reviewed_category", "")
+    note = request.form.get("review_note", "").strip()
+    candidate, _reason = candidate_from_outcome(review.outcome)
+    if not candidate:
+        flash("该反馈不满足训练候选审核条件。")
+    elif TrainingCandidateReview.query.filter_by(outcome_review_id=review.id).first():
+        flash("该候选已完成样本审核。")
+    elif decision not in {"ACCEPTED", "REJECTED"} or len(note) < 10 or (decision == "ACCEPTED" and category not in TRAINING_CATEGORIES):
+        flash("请填写有效的审核结论、类别和说明。")
+    else:
+        db.session.add(TrainingCandidateReview(outcome_review_id=review.id, decision=decision, reviewed_category=category or None, review_note=note, reviewed_by=current_user().username)); db.session.commit(); flash("已完成样本审核；接受项仍须版本化后才可训练。")
+    return redirect(url_for("auth.training_candidate_list"))

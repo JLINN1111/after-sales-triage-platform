@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from app import create_app, db
-from app.models import Ticket, TicketAction, TicketOutcome, TicketOutcomeReview, User
+from app.models import Ticket, TicketAction, TicketOutcome, TicketOutcomeReview, TrainingCandidateReview, User
 from app.services.ticket_actions import apply_ticket_action, initial_action_status
 
 
@@ -573,6 +573,60 @@ class AccessControlTests(unittest.TestCase):
         self.assertEqual(repeated.status_code, 302)
         with self.app.app_context():
             self.assertEqual(TicketOutcomeReview.query.count(), 1)
+
+    def test_admin_can_accept_training_candidate_once(self):
+        with self.app.app_context():
+            ticket = db.session.get(Ticket, "T-ACCESS-001")
+            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="RESOLVED", resolution_note="现场确认冷却风扇更换后恢复正常。", recorded_by="reviewer02")
+            db.session.add(outcome); db.session.commit()
+            review = TicketOutcomeReview(outcome=outcome, decision="APPROVED", review_note="允许进入后续训练候选审核。", reviewed_by="admin01")
+            db.session.add(review); db.session.commit(); review_id = review.id
+        client = self.app.test_client(); self.login(client, "admin01", "admin-test-password")
+        page = client.get("/admin/training-candidates")
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "review_note": "文本和类别经人工复核，可作为正式样本候选。"})
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            candidate = TrainingCandidateReview.query.one()
+            self.assertEqual(candidate.decision, "ACCEPTED")
+            self.assertEqual(candidate.reviewed_category, "THERMAL_COOLING")
+        repeated = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "REJECTED", "review_note": "重复审核不得覆盖已经完成的样本结论。"})
+        self.assertEqual(repeated.status_code, 302)
+        with self.app.app_context():
+            self.assertEqual(TrainingCandidateReview.query.count(), 1)
+
+    def test_training_candidate_page_redacts_description_and_allows_category_revision(self):
+        with self.app.app_context():
+            ticket = db.session.get(Ticket, "T-ACCESS-001")
+            ticket.description = "请联系13800138000，控制柜风扇异常。"
+            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="RESOLVED", resolution_note="现场确认风扇更换后恢复正常。", recorded_by="reviewer02")
+            review = TicketOutcomeReview(outcome=outcome, decision="APPROVED", review_note="允许进入后续训练候选审核。", reviewed_by="admin01")
+            db.session.add_all([outcome, review]); db.session.commit(); review_id = review.id
+        client = self.app.test_client(); self.login(client, "admin01", "admin-test-password")
+        page = client.get("/admin/training-candidates")
+        self.assertNotIn(b"13800138000", page.data)
+        self.assertIn(b"[PHONE_REDACTED]", page.data)
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "MECHANICAL", "review_note": "人工复核后修订类别，可作为正式样本候选。"})
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            self.assertEqual(TrainingCandidateReview.query.one().reviewed_category, "MECHANICAL")
+
+    def test_training_candidate_review_requires_admin_and_eligible_feedback(self):
+        with self.app.app_context():
+            ticket = db.session.get(Ticket, "T-ACCESS-001")
+            outcome = TicketOutcome(ticket=ticket, final_category="THERMAL_COOLING", resolution_status="PENDING", resolution_note="尚待现场确认。", recorded_by="reviewer02")
+            review = TicketOutcomeReview(outcome=outcome, decision="APPROVED", review_note="允许进入后续训练候选审核。", reviewed_by="admin01")
+            db.session.add_all([outcome, review]); db.session.commit(); review_id = review.id
+        agent = self.app.test_client(); self.login_agent(agent)
+        self.assertEqual(agent.get("/admin/training-candidates").status_code, 302)
+        admin = self.app.test_client(); self.login(admin, "admin01", "admin-test-password")
+        page = admin.get("/admin/training-candidates")
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        response = admin.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "review_note": "不满足条件的反馈不得形成训练候选审核。"})
+        self.assertEqual(response.status_code, 302)
+        with self.app.app_context():
+            self.assertEqual(TrainingCandidateReview.query.count(), 0)
 
 
 if __name__ == "__main__":

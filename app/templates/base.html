@@ -17,6 +17,7 @@
                     <a href="{{ url_for('tickets.list_tickets') }}">工单列表</a>
                     {% if can('user:manage') %}<a href="{{ url_for('auth.user_list') }}">账户管理</a>{% endif %}
                     {% if can('outcome:approve') %}<a href="{{ url_for('auth.outcome_review_list') }}">反馈审核</a>{% endif %}
+                    {% if can('outcome:approve') %}<a href="{{ url_for('auth.training_candidate_list') }}">训练候选审核</a>{% endif %}
                     <span>{{ current_user.username }}（{{ role_labels.get(current_user.role, current_user.role) }}）</span>
                     <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

@@ -100,3 +100,16 @@ class TicketOutcomeReview(db.Model):
     reviewed_by = db.Column(db.String(64), nullable=False)
     reviewed_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     outcome = db.relationship("TicketOutcome", back_populates="review")
+
+
+class TrainingCandidateReview(db.Model):
+    """对已批准反馈的最终样本审核；通过后仍需版本化才可训练。"""
+    __tablename__ = "training_candidate_reviews"
+    id = db.Column(db.Integer, primary_key=True)
+    outcome_review_id = db.Column(db.Integer, db.ForeignKey("ticket_outcome_reviews.id"), nullable=False, unique=True, index=True)
+    decision = db.Column(db.String(16), nullable=False)
+    reviewed_category = db.Column(db.String(32))
+    review_note = db.Column(db.Text, nullable=False)
+    reviewed_by = db.Column(db.String(64), nullable=False)
+    reviewed_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    outcome_review = db.relationship("TicketOutcomeReview")
