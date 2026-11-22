@@ -15,7 +15,7 @@
     </div>
     {% endif %}
 
-    <form method="post" action="{{ url_for('tickets.new_ticket') }}" class="ticket-form">
+    <form method="post" action="{{ url_for('tickets.new_ticket') }}" class="ticket-form" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-row">
             <div class="form-field">
@@ -98,6 +98,12 @@
                 <label for="submitter_note">补充说明</label>
                 <input id="submitter_note" name="submitter_note" type="text" value="{{ form.submitter_note }}" placeholder="可留空">
             </div>
+        </div>
+
+        <div class="form-field">
+            <label for="attachments">报修附件</label>
+            <input id="attachments" name="attachments" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf">
+            <p class="page-hint">可上传设备铭牌照片、报警截图、现场照片或 PDF；每张工单最多 5 个附件，单个不超过 5 MB。</p>
         </div>
 
         <div class="form-actions">

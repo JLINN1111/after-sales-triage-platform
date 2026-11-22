@@ -26,6 +26,25 @@
         <tr><th>提交时间</th><td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') if ticket.created_at else '-' }}</td></tr>
     </table>
 
+    <h2 class="section-title">报修附件</h2>
+    {% if ticket.attachments %}
+    <table class="detail-table">
+        <tr><th>文件名称</th><th>类型</th><th>上传时间</th><th>操作</th></tr>
+        {% for attachment in ticket.attachments %}
+        <tr><td>{{ attachment.original_name }}</td><td>{{ attachment.mime_type }}</td><td>{{ attachment.uploaded_at.strftime('%Y-%m-%d %H:%M') }}</td><td><a href="{{ url_for('tickets.download_attachment', ticket_id=ticket.ticket_id, attachment_id=attachment.id) }}">下载查看</a></td></tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="page-hint">暂无附件。</p>
+    {% endif %}
+    {% if can('ticket:attach') %}
+    <form method="post" action="{{ url_for('tickets.upload_attachment', ticket_id=ticket.ticket_id) }}" class="action-form" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-field"><label for="more_attachments">补充附件</label><input id="more_attachments" name="attachments" type="file" multiple accept="image/jpeg,image/png,image/webp,application/pdf"><p class="page-hint">支持 JPG、PNG、WEBP 图片和 PDF；单个不超过 5 MB，整张工单最多 5 个附件。</p></div>
+        <div class="form-actions"><button type="submit" class="btn btn-secondary">上传附件</button></div>
+    </form>
+    {% endif %}
+
     <h2 class="section-title">分诊建议</h2>
     {% if match_pending %}
     <p class="page-hint">该工单尚未完成分诊，以下结果将在系统处理后显示。</p>

@@ -15,9 +15,9 @@ ROLE_LABELS = {
 }
 
 ROLE_PERMISSIONS = {
-    "ADMIN": {"ticket:view", "ticket:submit", "ticket:follow_up", "ticket:review", "ticket:delete", "outcome:record", "user:manage"},
-    "AGENT": {"ticket:view", "ticket:submit", "ticket:supplement"},
-    "REVIEWER": {"ticket:view", "ticket:follow_up", "ticket:review", "outcome:record"},
+    "ADMIN": {"ticket:view", "ticket:submit", "ticket:attach", "ticket:follow_up", "ticket:review", "ticket:delete", "outcome:record", "user:manage"},
+    "AGENT": {"ticket:view", "ticket:submit", "ticket:attach", "ticket:supplement"},
+    "REVIEWER": {"ticket:view", "ticket:attach", "ticket:follow_up", "ticket:review", "outcome:record"},
 }
 
 ACTION_PERMISSIONS = {

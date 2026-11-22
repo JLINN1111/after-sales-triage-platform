@@ -8,11 +8,13 @@
 """
 
 from datetime import datetime
+from pathlib import Path
 
-from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, jsonify, redirect, render_template, request, send_from_directory, url_for
 
 from app import db
-from app.models import Ticket, TicketAction, TicketOutcome
+from app.models import Ticket, TicketAction, TicketAttachment, TicketOutcome
+from app.services.attachments import prepare_attachments, save_attachments
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
 from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
 from app.services.triage_service import triage_ticket
@@ -236,6 +238,16 @@ def new_ticket():
 
     form = {field: request.form.get(field, "") for field in FORM_FIELDS}
     errors = validate(form)
+    try:
+        prepared_attachments = prepare_attachments(
+            request.files.getlist("attachments"),
+            existing_count=0,
+            max_count=current_app.config["MAX_ATTACHMENTS_PER_TICKET"],
+            max_size=current_app.config["MAX_ATTACHMENT_SIZE"],
+        )
+    except ValueError as error:
+        prepared_attachments = []
+        errors.append(str(error))
     if errors:
         return render_template("tickets/form.html", form=form, errors=errors), 400
 
@@ -257,6 +269,12 @@ def new_ticket():
     )
     apply_triage(ticket)
     db.session.add(ticket)
+    db.session.add_all(save_attachments(
+        ticket,
+        prepared_attachments,
+        uploaded_by=current_user().username if current_user() else "SYSTEM",
+        upload_dir=current_app.config["ATTACHMENT_UPLOAD_DIR"],
+    ))
     db.session.commit()
     flash(f"报修提交成功，工单编号：{ticket.ticket_id}")
     return redirect(url_for("tickets.list_tickets"))
@@ -324,6 +342,49 @@ def ticket_action(ticket_id):
         }), 200
     flash("处理操作已保存。")
     return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
+
+
+@tickets_bp.post("/tickets/<ticket_id>/attachments")
+@login_required
+@permission_required("ticket:attach")
+def upload_attachment(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    require_ticket_access(ticket)
+    try:
+        prepared = prepare_attachments(
+            request.files.getlist("attachments"),
+            existing_count=len(ticket.attachments),
+            max_count=current_app.config["MAX_ATTACHMENTS_PER_TICKET"],
+            max_size=current_app.config["MAX_ATTACHMENT_SIZE"],
+        )
+        if not prepared:
+            raise ValueError("请选择至少一个附件。")
+        db.session.add_all(save_attachments(
+            ticket,
+            prepared,
+            uploaded_by=current_user().username if current_user() else "SYSTEM",
+            upload_dir=current_app.config["ATTACHMENT_UPLOAD_DIR"],
+        ))
+        db.session.commit()
+        flash("附件已上传。")
+    except ValueError as error:
+        flash(str(error))
+    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
+
+
+@tickets_bp.get("/tickets/<ticket_id>/attachments/<int:attachment_id>/download")
+@login_required
+@permission_required("ticket:view")
+def download_attachment(ticket_id, attachment_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    require_ticket_access(ticket)
+    attachment = db.get_or_404(TicketAttachment, attachment_id)
+    if attachment.ticket_id != ticket.ticket_id:
+        abort(404)
+    path = current_app.config["ATTACHMENT_UPLOAD_DIR"]
+    if not (Path(path) / attachment.stored_name).is_file():
+        abort(404)
+    return send_from_directory(path, attachment.stored_name, as_attachment=True, download_name=attachment.original_name)
 
 
 @tickets_bp.post("/tickets/<ticket_id>/outcomes")

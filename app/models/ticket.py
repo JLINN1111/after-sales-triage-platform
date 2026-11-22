@@ -53,6 +53,7 @@ class Ticket(db.Model):
         order_by="TicketAction.action_at",
     )
     outcomes = db.relationship("TicketOutcome", back_populates="ticket", cascade="all, delete-orphan", order_by="TicketOutcome.recorded_at")
+    attachments = db.relationship("TicketAttachment", back_populates="ticket", cascade="all, delete-orphan", order_by="TicketAttachment.uploaded_at")
 
 
 class TicketAction(db.Model):
@@ -88,3 +89,20 @@ class TicketOutcome(db.Model):
     recorded_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     ticket = db.relationship("Ticket", back_populates="outcomes")
+
+
+class TicketAttachment(db.Model):
+    """工单附件元数据；实际文件仅保存在本机运行目录。"""
+
+    __tablename__ = "ticket_attachments"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(db.String(32), db.ForeignKey("tickets.ticket_id"), nullable=False, index=True)
+    original_name = db.Column(db.String(255), nullable=False)
+    stored_name = db.Column(db.String(96), nullable=False, unique=True)
+    mime_type = db.Column(db.String(64), nullable=False)
+    file_size = db.Column(db.Integer, nullable=False)
+    uploaded_by = db.Column(db.String(64), nullable=False)
+    uploaded_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+    ticket = db.relationship("Ticket", back_populates="attachments")
