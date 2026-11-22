@@ -4,7 +4,7 @@
     python 运行脚本/init_db.py
 
 说明：
-- 只负责建表，不写入任何演示数据。
+- 创建业务表，并在首次运行时导入仓库随附的公开知识资料。
 - 数据库文件位置由 app/config.py 的 SQLALCHEMY_DATABASE_URI 决定。
 - 重复执行不会报错，已存在的表会被保留，不会清空数据。
 """
@@ -17,13 +17,17 @@ from sqlalchemy import inspect, text
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app import create_app, db
-from app.models import Ticket, TicketAction, TicketAttachment, TicketOutcome, User  # noqa: F401  导入模型，建表时才能找到它
+from app.models import KnowledgeEntry, Ticket, TicketAction, TicketAttachment, TicketOutcome, User  # noqa: F401  导入模型，建表时才能找到它
+from app.services.knowledge_matcher import seed_public_knowledge
 
 
 def init_database():
     app = create_app()
     with app.app_context():
         db.create_all()
+        seeded_count = seed_public_knowledge()
+        if seeded_count:
+            print(f"已导入 {seeded_count} 条公开知识资料，后续可在知识库管理页维护。")
         columns = {column["name"] for column in inspect(db.engine).get_columns("tickets")}
         if "submitted_by" not in columns:
             db.session.execute(text("ALTER TABLE tickets ADD COLUMN submitted_by VARCHAR(64)"))

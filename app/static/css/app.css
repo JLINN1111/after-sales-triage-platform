@@ -54,3 +54,21 @@ a:hover { text-decoration: underline; }
 .btn-delete:hover { text-decoration: underline; color: #96281b; }
 .action-form { margin-bottom: 18px; }
 .btn:disabled { cursor: wait; opacity: 0.65; }
+
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 18px; }
+.card h2 { margin-top: 0; font-size: 16px; }
+.muted { color: #667085; font-size: 13px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
+.form-grid label { display: block; font-weight: 600; }
+.form-grid input, .form-grid select, .form-grid textarea { width: 100%; margin-top: 6px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font: inherit; }
+.form-grid textarea { min-height: 72px; resize: vertical; }
+.field-wide, .form-grid .form-actions { grid-column: 1 / -1; }
+.table-wrap { overflow-x: auto; }
+.table-wrap table { width: 100%; border-collapse: collapse; }
+.table-wrap th, .table-wrap td { border: 1px solid #e2e8f0; padding: 9px 10px; text-align: left; vertical-align: top; }
+.table-wrap th { background: #f7f9fc; }
+.button { display: inline-block; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; }
+.button.secondary { color: #333; }
+.inline-form { display: inline; margin-left: 8px; }
+.btn-link { border: 0; background: none; color: #1a6fc4; cursor: pointer; padding: 0; font: inherit; }
+@media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .field-wide, .form-grid .form-actions { grid-column: auto; } }

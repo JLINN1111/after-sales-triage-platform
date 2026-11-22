@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}编辑知识资料 - 售后报修智能分诊平台{% endblock %}
+{% block content %}
+<h1>编辑知识资料</h1>
+<p class="muted">资料编号：{{ entry.knowledge_id }}。请仅保留可公开核验的内容。</p>
+<section class="card"><form method="post" class="form-grid"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% include "knowledge/_fields.html" %}<div class="form-actions"><button type="submit">保存修改</button><a class="button secondary" href="{{ url_for('knowledge.list_entries') }}">返回</a></div></form></section>
+{% endblock %}

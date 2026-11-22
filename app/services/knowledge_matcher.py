@@ -19,8 +19,12 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from flask import has_app_context
+
 from app.config import ROOT
+from app import db
 from app.algorithms.knowledge_retrieval import bfs_recall, rank_candidates
+from app.models import KnowledgeEntry
 
 KNOWLEDGE_CSV = ROOT / "数据资料" / "维修知识" / "知识库.csv"
 LEDGER_CSV = ROOT / "数据资料" / "真实业务准备" / "设备台账.csv"
@@ -61,8 +65,46 @@ def _read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def _entry_to_row(entry: KnowledgeEntry) -> dict[str, str]:
+    """将可维护知识条目转换为既有匹配算法需要的字典格式。"""
+    fields = (
+        "knowledge_id", "brand", "equipment_model", "controller_system", "software_version",
+        "equipment_category", "subsystem", "title", "symptoms", "alarm_code",
+        "fault_category", "summary", "source_name", "source_page", "source_url",
+    )
+    return {field: str(getattr(entry, field) or "") for field in fields}
+
+
 def load_knowledge() -> list[dict[str, str]]:
+    """优先读取管理员维护的启用条目；未初始化时保留 CSV 基准资料兜底。"""
+    if not has_app_context():
+        return _read_csv(KNOWLEDGE_CSV)
+    entries = KnowledgeEntry.query.filter_by(is_active=True).order_by(KnowledgeEntry.knowledge_id).all()
+    if entries:
+        return [_entry_to_row(entry) for entry in entries]
+    # 已有条目但全部停用时，必须尊重管理员的停用决定，不能回退到 CSV 重新启用资料。
+    if KnowledgeEntry.query.count() > 0:
+        return []
     return _read_csv(KNOWLEDGE_CSV)
+
+
+def seed_public_knowledge() -> int:
+    """首次初始化时将随仓库提供的公开资料导入可维护知识库。"""
+    if KnowledgeEntry.query.count() > 0:
+        return 0
+    rows = _read_csv(KNOWLEDGE_CSV)
+    for row in rows:
+        db.session.add(KnowledgeEntry(
+            knowledge_id=row["knowledge_id"],
+            brand=row["brand"], equipment_model=row["equipment_model"],
+            controller_system=row["controller_system"], software_version=row["software_version"] or "ANY",
+            equipment_category=row["equipment_category"], subsystem=row["subsystem"], title=row["title"],
+            symptoms=row["symptoms"], alarm_code=row["alarm_code"] or None,
+            fault_category=row["fault_category"], summary=row["summary"], source_name=row["source_name"],
+            source_page=row["source_page"], source_url=row["source_url"], created_by="SYSTEM",
+        ))
+    db.session.commit()
+    return len(rows)
 
 
 def load_ledger() -> list[dict[str, str]]:

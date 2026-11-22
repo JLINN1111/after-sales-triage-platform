@@ -48,8 +48,10 @@ def create_app(config_overrides=None):
         return redirect(url_for("tickets.list_tickets"))
 
     from app.routes.auth import auth_bp
+    from app.routes.knowledge import knowledge_bp
     from app.routes.tickets import tickets_bp
     app.register_blueprint(auth_bp)
+    app.register_blueprint(knowledge_bp)
     app.register_blueprint(tickets_bp)
 
     return app

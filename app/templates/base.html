@@ -15,7 +15,10 @@
                 {% if current_user %}
                     {% if can('ticket:submit') %}<a href="{{ url_for('tickets.new_ticket') }}">提交报修</a>{% endif %}
                     <a href="{{ url_for('tickets.list_tickets') }}">工单列表</a>
-                    {% if can('user:manage') %}<a href="{{ url_for('auth.user_list') }}">账户管理</a>{% endif %}
+                    {% if can('user:manage') %}
+                        <a href="{{ url_for('knowledge.list_entries') }}">知识库管理</a>
+                        <a href="{{ url_for('auth.user_list') }}">账户管理</a>
+                    {% endif %}
                     <span>{{ current_user.username }}（{{ role_labels.get(current_user.role, current_user.role) }}）</span>
                     <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

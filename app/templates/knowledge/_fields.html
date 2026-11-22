@@ -1,0 +1,14 @@
+<label>品牌<input name="brand" value="{{ values.brand }}" required></label>
+<label>设备型号<input name="equipment_model" value="{{ values.equipment_model }}" required></label>
+<label>控制系统<input name="controller_system" value="{{ values.controller_system }}" required></label>
+<label>软件版本<input name="software_version" value="{{ values.software_version or 'ANY' }}" required></label>
+<label>设备类别<select name="equipment_category" required>{% for item in equipment_categories %}<option value="{{ item }}" {% if values.equipment_category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></label>
+<label>设备子系统<select name="subsystem" required>{% for item in subsystems %}<option value="{{ item }}" {% if values.subsystem == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></label>
+<label class="field-wide">资料主题<input name="title" value="{{ values.title }}" required></label>
+<label class="field-wide">可观察现象<textarea name="symptoms" required>{{ values.symptoms }}</textarea></label>
+<label>报警代码（可留空）<input name="alarm_code" value="{{ values.alarm_code }}"></label>
+<label>故障类别<select name="fault_category" required>{% for item in fault_categories %}<option value="{{ item }}" {% if values.fault_category == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></label>
+<label class="field-wide">处理参考摘要<textarea name="summary" required>{{ values.summary }}</textarea></label>
+<label>公开来源名称<input name="source_name" value="{{ values.source_name }}" required></label>
+<label>来源页码或章节<input name="source_page" value="{{ values.source_page }}" required></label>
+<label class="field-wide">公开资料链接<input name="source_url" type="url" value="{{ values.source_url }}" required></label>

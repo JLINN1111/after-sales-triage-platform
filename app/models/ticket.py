@@ -106,3 +106,29 @@ class TicketAttachment(db.Model):
     uploaded_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     ticket = db.relationship("Ticket", back_populates="attachments")
+
+
+class KnowledgeEntry(db.Model):
+    """经管理员确认后可用于分诊参考的公开知识条目。"""
+
+    __tablename__ = "knowledge_entries"
+
+    knowledge_id = db.Column(db.String(64), primary_key=True)
+    brand = db.Column(db.String(128), nullable=False)
+    equipment_model = db.Column(db.String(128), nullable=False)
+    controller_system = db.Column(db.String(128), nullable=False)
+    software_version = db.Column(db.String(64), nullable=False, default="ANY")
+    equipment_category = db.Column(db.String(64), nullable=False)
+    subsystem = db.Column(db.String(64), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    symptoms = db.Column(db.Text, nullable=False)
+    alarm_code = db.Column(db.String(128))
+    fault_category = db.Column(db.String(64), nullable=False)
+    summary = db.Column(db.Text, nullable=False)
+    source_name = db.Column(db.String(255), nullable=False)
+    source_page = db.Column(db.String(128), nullable=False)
+    source_url = db.Column(db.Text, nullable=False)
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    created_by = db.Column(db.String(64), nullable=False, default="SYSTEM")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}知识库管理 - 售后报修智能分诊平台{% endblock %}
+{% block content %}
+<h1>知识库管理</h1>
+<p class="muted">仅维护可公开核验的设备处理参考资料。资料用于提供检查方向，不能替代现场判断或安全处置。</p>
+<section class="card">
+  <h2>添加公开资料</h2>
+  <form method="post" action="{{ url_for('knowledge.create_entry') }}" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% include "knowledge/_fields.html" %}
+    <div class="form-actions"><button type="submit">加入知识库</button></div>
+  </form>
+</section>
+<section class="card">
+  <h2>现有资料（{{ entries|length }}）</h2>
+  <div class="table-wrap"><table><thead><tr><th>状态</th><th>资料主题</th><th>设备范围</th><th>公开来源</th><th>操作</th></tr></thead><tbody>
+  {% for entry in entries %}<tr>
+    <td>{{ '启用' if entry.is_active else '已停用' }}</td><td><strong>{{ entry.title }}</strong><br><span class="muted">{{ entry.summary }}</span></td>
+    <td>{{ entry.brand }} / {{ entry.equipment_model }}<br><span class="muted">{{ entry.subsystem }}</span></td>
+    <td><a href="{{ entry.source_url }}" target="_blank" rel="noopener">{{ entry.source_name }}</a><br><span class="muted">{{ entry.source_page }}</span></td>
+    <td><a class="button secondary" href="{{ url_for('knowledge.edit_entry', knowledge_id=entry.knowledge_id) }}">编辑</a>
+      <form method="post" action="{{ url_for('knowledge.toggle_status', knowledge_id=entry.knowledge_id) }}" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn-link" type="submit">{{ '停用' if entry.is_active else '启用' }}</button></form></td>
+  </tr>{% else %}<tr><td colspan="5">暂无资料，请先添加经过核验的公开来源。</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}
