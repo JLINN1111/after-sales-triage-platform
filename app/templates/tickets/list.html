@@ -4,8 +4,8 @@
 {% block content %}
 <div class="page-card">
     <div class="page-heading">
-        <h1 class="page-title">工单列表</h1>
-        <a href="{{ url_for('tickets.new_ticket') }}" class="btn btn-primary">+ 提交报修</a>
+        <h1 class="page-title">{{ page_title }}</h1>
+        {% if can('ticket:submit') %}<a href="{{ url_for('tickets.new_ticket') }}" class="btn btn-primary">+ 提交报修</a>{% endif %}
     </div>
 
     {% if tickets %}
@@ -26,7 +26,7 @@
                 <td>{{ t.ticket_id }}</td>
                 <td>{{ t.equipment_model or '—' }}</td>
                 <td>{{ t.description[:20] }}{% if t.description|length > 20 %}…{% endif %}</td>
-                <td><span class="status-badge">{{ display.action_status.get(t.action_status, t.action_status) }}</span></td>
+                <td><span class="status-badge">{{ status_labels.get(t.ticket_id, '处理中') }}</span></td>
                 <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') if t.created_at else '-' }}</td>
                 <td class="action-cell">
                     <a href="{{ url_for('tickets.ticket_detail', ticket_id=t.ticket_id) }}">查看详情</a>

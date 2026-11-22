@@ -12,6 +12,8 @@
 import sys
 from pathlib import Path
 
+from sqlalchemy import inspect, text
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app import create_app, db
@@ -22,6 +24,13 @@ def init_database():
     app = create_app()
     with app.app_context():
         db.create_all()
+        columns = {column["name"] for column in inspect(db.engine).get_columns("tickets")}
+        if "submitted_by" not in columns:
+            db.session.execute(text("ALTER TABLE tickets ADD COLUMN submitted_by VARCHAR(64)"))
+            db.session.execute(text("CREATE INDEX IF NOT EXISTS ix_tickets_submitted_by ON tickets (submitted_by)"))
+            db.session.execute(text("UPDATE tickets SET submitted_by = 'SYSTEM' WHERE submitted_by IS NULL"))
+            db.session.commit()
+            print("已补建工单提交人字段，并将既有工单标记为系统历史记录。")
         if User.query.count() == 0:
             username = app.config["BOOTSTRAP_ADMIN_USERNAME"].strip()
             password = app.config["BOOTSTRAP_ADMIN_PASSWORD"]

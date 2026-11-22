@@ -63,7 +63,7 @@ class TicketActionTests(unittest.TestCase):
         response = self.app.test_client().get("/tickets")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("人工复核中".encode("utf-8"), response.data)
+        self.assertIn("售后处理中".encode("utf-8"), response.data)
         self.assertNotIn(b"HUMAN_REVIEW", response.data)
 
     def test_confirm_preserves_system_result_and_writes_history(self):
@@ -183,7 +183,7 @@ class TicketActionTests(unittest.TestCase):
         response = self.app.test_client().get("/tickets/T-ACTION-001")
         self.assertEqual(response.status_code, 200)
         self.assertIn("操作历史".encode("utf-8"), response.data)
-        self.assertIn("转人工处理".encode("utf-8"), response.data)
+        self.assertIn("转现场处理".encode("utf-8"), response.data)
         self.assertIn("客服001".encode("utf-8"), response.data)
 
     def test_history_does_not_repeat_follow_up_content_for_confirmation(self):
@@ -258,7 +258,7 @@ class TicketActionTests(unittest.TestCase):
             "action_type": "HANDOFF", "action_by": "客服001", "action_note": "需要人工核对。",
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("客服操作已保存。".encode("utf-8"), response.data)
+        self.assertIn("处理操作已保存。".encode("utf-8"), response.data)
 
     def test_form_confirm_redirects_and_saves_confirmation(self):
         response = self.app.test_client().post("/tickets/T-ACTION-001/actions", data={
@@ -312,7 +312,7 @@ class TicketActionTests(unittest.TestCase):
             db.session.commit()
         response = self.app.test_client().get("/tickets/T-ACTION-001")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("关闭前必须先记录“转人工处理”".encode("utf-8"), response.data)
+        self.assertIn("关闭前必须先记录“转现场处理”".encode("utf-8"), response.data)
         self.assertNotIn(b'name="action_type" value="CLOSE"', response.data)
 
 class CsrfProtectionTests(unittest.TestCase):
@@ -385,7 +385,7 @@ class AccessControlTests(unittest.TestCase):
                 ticket_id="T-ACCESS-001", equipment_type="CNC",
                 description="控制柜温度过高，冷却风扇异常。", operating_state="RUNNING",
                 shutdown="NO", safety_risk="NO", alarm_code_status="PRESENT", alarm_code="253",
-                predicted_category="THERMAL_COOLING", priority="NORMAL", action_status="NEW",
+                predicted_category="THERMAL_COOLING", priority="NORMAL", action_status="NEW", submitted_by="agent01",
             ))
             db.session.commit()
 
@@ -412,9 +412,29 @@ class AccessControlTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("/login", response.headers["Location"])
 
-    def test_agent_cannot_confirm_but_action_history_uses_logged_in_account(self):
+    def test_agent_only_sees_own_tickets(self):
+        with self.app.app_context():
+            db.session.add(Ticket(
+                ticket_id="T-ACCESS-OTHER", equipment_type="CNC",
+                description="另一位报修人员提交的设备异常。", operating_state="RUNNING",
+                shutdown="NO", safety_risk="NO", alarm_code_status="NONE",
+                action_status="NEW", submitted_by="other-agent",
+            ))
+            db.session.commit()
         client = self.app.test_client()
         self.login_agent(client)
+        listing = client.get("/tickets")
+        self.assertIn("T-ACCESS-001".encode("utf-8"), listing.data)
+        self.assertNotIn("T-ACCESS-OTHER".encode("utf-8"), listing.data)
+        self.assertEqual(client.get("/tickets/T-ACCESS-OTHER").status_code, 403)
+
+    def test_agent_cannot_confirm_but_can_supplement_own_ticket(self):
+        client = self.app.test_client()
+        self.login_agent(client)
+        with self.app.app_context():
+            ticket = db.session.get(Ticket, "T-ACCESS-001")
+            ticket.action_status = "NEED_INFO"
+            db.session.commit()
         detail = client.get("/tickets/T-ACCESS-001")
         token = re.search(rb'<meta name="csrf-token" content="([^"]+)"', detail.data).group(1).decode()
         denied = client.post(
@@ -425,7 +445,7 @@ class AccessControlTests(unittest.TestCase):
         self.assertEqual(denied.status_code, 403)
         allowed = client.post(
             "/tickets/T-ACCESS-001/actions",
-            json={"action_type": "FOLLOW_UP", "action_by": "forged", "customer_follow_up": "请补充设备型号。"},
+            json={"action_type": "SUPPLEMENT", "action_by": "forged", "equipment_model": "VF-2"},
             headers={"X-CSRF-Token": token},
         )
         self.assertEqual(allowed.status_code, 200)

@@ -22,7 +22,7 @@
         <tr><th>报警代码状态</th><td>{{ display.alarm_status.get(ticket.alarm_code_status, ticket.alarm_code_status) }}</td></tr>
         <tr><th>报警代码</th><td>{{ ticket.alarm_code or '-' }}</td></tr>
         <tr><th>补充说明</th><td>{{ ticket.submitter_note or '-' }}</td></tr>
-        <tr><th>处理状态</th><td><span class="status-badge">{{ display.action_status.get(ticket.action_status, ticket.action_status) }}</span></td></tr>
+        <tr><th>处理进度</th><td><span class="status-badge">{{ status_label }}</span></td></tr>
         <tr><th>提交时间</th><td>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') if ticket.created_at else '-' }}</td></tr>
     </table>
 
@@ -35,30 +35,30 @@
         <tr><th>建议优先级</th><td>{{ priority_zh }}</td></tr>
         <tr><th>判断依据</th><td>{{ evidence_zh | join('；') if evidence_zh else '-' }}</td></tr>
         <tr><th>建议补充信息</th><td>{{ (ticket.follow_up_questions or []) | join('；') if ticket.follow_up_questions else '无' }}</td></tr>
-        <tr><th>建议转人工</th><td>{{ '是' if ticket.recommend_human else '否' }}</td></tr>
+        <tr><th>建议售后处理</th><td>{{ '是' if ticket.recommend_human else '否' }}</td></tr>
         {% if handoff_zh %}
-        <tr><th>转人工原因</th><td>{{ handoff_zh | join('；') }}</td></tr>
+        <tr><th>处理原因</th><td>{{ handoff_zh | join('；') }}</td></tr>
         {% endif %}
     </table>
     {% endif %}
 
-    <h2 class="section-title">客服处理</h2>
-    <p class="page-hint">当前处理状态：<span class="status-badge">{{ display.action_status.get(ticket.action_status, ticket.action_status) }}</span></p>
+    <h2 class="section-title">工单处理</h2>
+    <p class="page-hint">当前处理进度：<span class="status-badge">{{ status_label }}</span></p>
     {% if ticket.action_status == 'HUMAN_REVIEW' %}
-    <p class="page-hint">下一步：仍需升级现场人员时记录转人工；仍缺资料时记录补问；已取得人工核对结论时填写核对说明并确认分诊。</p>
+    <p class="page-hint">下一步：如需现场处理则记录转现场处理；仍缺资料时记录补问；已取得核对结论时填写说明并确认分诊。</p>
     {% elif ticket.action_status == 'NEED_INFO' %}
     <p class="page-hint">下一步：收到客户回复后，先录入客户补充信息并重新分诊；仍缺资料时可继续补问。</p>
     {% elif ticket.action_status == 'NEW' %}
-    <p class="page-hint">下一步：核对系统建议后确认分诊；如资料不足则记录补问，如需现场处理则转人工。</p>
+    <p class="page-hint">下一步：核对系统建议后确认分诊；如资料不足则记录补问，如需现场处理则转现场处理。</p>
     {% elif ticket.action_status == 'CONFIRMED' %}
-    <p class="page-hint">下一步：如结论变化可修订；需要现场处理可转人工；满足安全限制后可关闭客服工单。</p>
+    <p class="page-hint">下一步：如结论变化可修订；需要现场处理可转现场处理；满足安全限制后可关闭工单。</p>
     {% endif %}
     {% if ticket.safety_risk in ['YES', 'UNKNOWN'] or ticket.shutdown in ['YES', 'UNKNOWN'] %}
     <p class="alert alert-warning">
-        该工单涉及安全风险、停机或关键信息未确认，请先转人工核对；平台仅提供分诊辅助，不替代现场维修诊断。
+        该工单涉及安全风险、停机或关键信息未确认，请先转现场处理；平台仅提供分诊辅助，不替代现场维修诊断。
     </p>
     {% endif %}
-    {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW', 'CONFIRMED'] %}
+    {% if can_action('HANDOFF') and ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW', 'CONFIRMED'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="HANDOFF">
@@ -68,17 +68,17 @@
                 <input id="action_by" name="action_by" required placeholder="如：客服001">
             </div>
             <div class="form-field">
-                <label for="action_note">转人工原因 <span class="required">*</span></label>
-                <textarea id="action_note" name="action_note" required rows="3" placeholder="请填写需要人工核对的原因"></textarea>
+                <label for="action_note">转现场原因 <span class="required">*</span></label>
+                <textarea id="action_note" name="action_note" required rows="3" placeholder="请填写需要现场处理的原因"></textarea>
             </div>
         </div>
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">转人工处理</button>
+            <button type="submit" class="btn btn-primary">转现场处理</button>
         </div>
     </form>
     {% endif %}
 
-    {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
+    {% if can_action('FOLLOW_UP') and ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="FOLLOW_UP">
@@ -98,7 +98,7 @@
     </form>
     {% endif %}
 
-    {% if ticket.action_status == 'NEED_INFO' %}
+    {% if can_action('SUPPLEMENT') and ticket.action_status == 'NEED_INFO' %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="SUPPLEMENT">
@@ -150,7 +150,7 @@
     </form>
     {% endif %}
 
-    {% if ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
+    {% if can_action('CONFIRM') and ticket.action_status in ['NEW', 'NEED_INFO', 'HUMAN_REVIEW'] %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="CONFIRM">
@@ -190,7 +190,7 @@
     </form>
     {% endif %}
 
-    {% if ticket.action_status == 'CONFIRMED' %}
+    {% if can_action('EDIT') and ticket.action_status == 'CONFIRMED' %}
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="EDIT">
@@ -228,9 +228,9 @@
     </form>
     {% endif %}
 
-    {% if ticket.action_status == 'CONFIRMED' %}
+    {% if can_action('CLOSE') and ticket.action_status == 'CONFIRMED' %}
         {% if close_requires_handoff and not has_handoff %}
-        <p class="alert alert-warning">该工单涉及安全风险、停机或状态未知。关闭前必须先记录“转人工处理”，由人工核对后再确认关闭。</p>
+        <p class="alert alert-warning">该工单涉及安全风险、停机或状态未知。关闭前必须先记录“转现场处理”，由人工核对后再确认关闭。</p>
         {% else %}
         <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -253,7 +253,7 @@
     {% endif %}
 
     <h2 class="section-title">处理结果反馈</h2>
-    <p class="page-hint">仅复核主管或管理员可记录。反馈作为业务处理记录保存，不会自动改变当前分诊结果。</p>
+    <p class="page-hint">仅售后处理人员或管理员可记录。反馈作为业务处理记录保存，不会自动改变当前分诊结果。</p>
     {% if can('outcome:record') and ticket.action_status in ['CONFIRMED', 'CLOSED'] %}
     <form method="post" action="{{ url_for('tickets.record_outcome', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -278,7 +278,7 @@
         {% endfor %}
     </table>
     {% else %}
-    <p class="page-hint">暂未记录客服操作。</p>
+    <p class="page-hint">暂未记录处理操作。</p>
     {% endif %}
 
     <h2 class="section-title">维修知识参考</h2>
@@ -304,7 +304,7 @@
     </table>
     {% endif %}
     {% if not exact_items and not reference_items %}
-    <p class="page-hint">请补充设备品牌、型号、控制系统、报警代码等信息，或转人工处理。</p>
+    <p class="page-hint">请补充设备品牌、型号、控制系统、报警代码等信息，或由售后处理。</p>
     {% endif %}
     {% endif %}
 </div>

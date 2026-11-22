@@ -9,14 +9,14 @@
 
 from datetime import datetime
 
-from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
 
 from app import db
 from app.models import Ticket, TicketAction, TicketOutcome
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
 from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
 from app.services.triage_service import triage_ticket
-from app.services.access_control import action_permission_required, current_user, login_required, permission_required
+from app.services.access_control import action_permission_required, can_access_ticket, current_user, login_required, permission_required
 
 tickets_bp = Blueprint("tickets", __name__)
 
@@ -33,7 +33,7 @@ DISPLAY = {
     "match": {
         "EXACT": ("已匹配对应设备知识", "已找到与当前设备信息相符的参考资料。"),
         "REFERENCE": ("找到参考信息，需人工核对", "找到同类设备参考资料，请人工核对型号和控制系统。"),
-        "NONE": ("暂未找到适用知识", "暂未找到对应资料，请补充设备信息或转人工处理。"),
+        "NONE": ("暂未找到适用知识", "暂未找到对应资料，请补充设备信息或由售后处理。"),
     },
     "equipment": {
         "CNC": "数控机床/加工设备", "INJECTION": "注塑机", "CONVEYOR": "输送线/传送带",
@@ -46,12 +46,12 @@ DISPLAY = {
     },
     "alarm_status": {"PRESENT": "有报警代码", "NONE": "无报警", "UNKNOWN": "不清楚"},
     "action": {
-        "FOLLOW_UP": "补问信息", "HANDOFF": "转人工处理", "CONFIRM": "确认分诊",
+        "FOLLOW_UP": "补问信息", "HANDOFF": "转现场处理", "CONFIRM": "确认分诊",
         "SUPPLEMENT": "录入客户补充信息", "EDIT": "修订确认结果", "CLOSE": "关闭工单",
     },
     "action_status": {
-        "NEW": "待处理", "NEED_INFO": "待补充信息", "HUMAN_REVIEW": "人工复核中",
-        "CONFIRMED": "已确认", "CLOSED": "已关闭",
+        "NEW": "待售后处理", "NEED_INFO": "待补充信息", "HUMAN_REVIEW": "售后处理中",
+        "CONFIRMED": "处理中", "CLOSED": "已完成",
     },
     "category_code": {
         "ELECTRICAL_CONTROL": "电气或控制异常", "MECHANICAL": "机械或传动异常",
@@ -59,7 +59,7 @@ DISPLAY = {
         "OTHER_UNKNOWN": "其他或暂无法判断",
     },
     "evidence": {
-        "RULE-SAFETY-YES": "存在安全风险，需人工处理",
+        "RULE-SAFETY-YES": "存在安全风险，需售后处理",
         "RULE-SHUTDOWN-YES": "设备已停机，需优先处理",
         "RULE-SAFETY-UNKNOWN": "请先确认现场是否存在安全风险",
         "RULE-SHUTDOWN-UNKNOWN": "请确认设备目前是否停机",
@@ -133,6 +133,19 @@ def action_detail(action):
             parts.append(f"说明：{action.action_note}")
         return "；".join(parts) or "-"
     return action.action_note or "-"
+
+
+def business_status(ticket):
+    """将内部处理状态转换为报修业务人员可理解的进度。"""
+
+    if ticket.action_status == "HUMAN_REVIEW" and any(action.action_type == "HANDOFF" for action in ticket.actions):
+        return "已转现场处理"
+    return DISPLAY["action_status"].get(ticket.action_status, "处理中")
+
+
+def require_ticket_access(ticket):
+    if not can_access_ticket(ticket):
+        abort(403)
 
 # 统一分诊结果写回工单的字段（triaged_at 是字符串，需转 datetime）
 RESULT_FIELDS = [
@@ -239,6 +252,7 @@ def new_ticket():
         alarm_code_status=form["alarm_code_status"],
         alarm_code=form["alarm_code"].strip() or None,
         submitter_note=form["submitter_note"].strip() or None,
+        submitted_by=current_user().username if current_user() else "SYSTEM",
         action_status="NEW",
     )
     apply_triage(ticket)
@@ -252,8 +266,16 @@ def new_ticket():
 @login_required
 @permission_required("ticket:view")
 def list_tickets():
-    tickets = Ticket.query.order_by(Ticket.created_at.desc()).all()
-    return render_template("tickets/list.html", tickets=tickets, display=DISPLAY)
+    user = current_user()
+    query = Ticket.query
+    if user and user.role == "AGENT":
+        query = query.filter_by(submitted_by=user.username)
+    tickets = query.order_by(Ticket.created_at.desc()).all()
+    return render_template(
+        "tickets/list.html", tickets=tickets, display=DISPLAY,
+        page_title="我的报修" if user and user.role == "AGENT" else "工单列表",
+        status_labels={ticket.ticket_id: business_status(ticket) for ticket in tickets},
+    )
 
 
 @tickets_bp.route("/tickets/<ticket_id>/delete", methods=["POST"])
@@ -262,6 +284,7 @@ def list_tickets():
 def delete_ticket(ticket_id):
     """删除一张工单；仅接受 POST，避免误操作与搜索引擎抓取触发。"""
     ticket = Ticket.query.get_or_404(ticket_id)
+    require_ticket_access(ticket)
     db.session.delete(ticket)
     db.session.commit()
     flash(f"工单 {ticket_id} 已删除。")
@@ -274,6 +297,7 @@ def delete_ticket(ticket_id):
 def ticket_action(ticket_id):
     """接收客服补问、转人工、确认、修订或关闭操作并保存留痕。"""
     ticket = Ticket.query.get_or_404(ticket_id)
+    require_ticket_access(ticket)
     payload = request.get_json(silent=True) if request.is_json else request.form.to_dict()
     payload = dict(payload or {})
     if current_user() is not None:
@@ -298,7 +322,7 @@ def ticket_action(ticket_id):
             "action_status": ticket.action_status,
             "action_id": action.id,
         }), 200
-    flash("客服操作已保存。")
+    flash("处理操作已保存。")
     return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
 
 
@@ -307,6 +331,7 @@ def ticket_action(ticket_id):
 @permission_required("outcome:record")
 def record_outcome(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
+    require_ticket_access(ticket)
     category = request.form.get("final_category", "")
     resolution_status = request.form.get("resolution_status", "")
     note = request.form.get("resolution_note", "").strip()
@@ -333,6 +358,7 @@ def record_outcome(ticket_id):
 @permission_required("ticket:view")
 def ticket_detail(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
+    require_ticket_access(ticket)
     match_level = ticket.knowledge_match_level
     has_handoff = any(action.action_type == "HANDOFF" for action in ticket.actions)
     action_details = {action.id: action_detail(action) for action in ticket.actions}
@@ -353,4 +379,5 @@ def ticket_detail(ticket_id):
         action_details=action_details,
         action_note_required=(ticket.action_status == "HUMAN_REVIEW" or needs_handoff_before_close(ticket)),
         resolution_status_zh={"RESOLVED": "已解决", "PARTIALLY_RESOLVED": "部分解决", "UNRESOLVED": "未解决", "UNKNOWN": "暂不确定"},
+        status_label=business_status(ticket),
     )

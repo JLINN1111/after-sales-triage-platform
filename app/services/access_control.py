@@ -10,19 +10,19 @@ from app.models import User
 
 ROLE_LABELS = {
     "ADMIN": "平台管理员",
-    "AGENT": "客服专员",
-    "REVIEWER": "复核主管",
+    "AGENT": "报修业务人员",
+    "REVIEWER": "售后处理人员",
 }
 
 ROLE_PERMISSIONS = {
     "ADMIN": {"ticket:view", "ticket:submit", "ticket:follow_up", "ticket:review", "ticket:delete", "outcome:record", "user:manage"},
-    "AGENT": {"ticket:view", "ticket:submit", "ticket:follow_up"},
+    "AGENT": {"ticket:view", "ticket:submit", "ticket:supplement"},
     "REVIEWER": {"ticket:view", "ticket:follow_up", "ticket:review", "outcome:record"},
 }
 
 ACTION_PERMISSIONS = {
     "FOLLOW_UP": "ticket:follow_up",
-    "SUPPLEMENT": "ticket:follow_up",
+    "SUPPLEMENT": "ticket:supplement",
     "HANDOFF": "ticket:follow_up",
     "CONFIRM": "ticket:review",
     "EDIT": "ticket:review",
@@ -47,6 +47,19 @@ def can(permission: str) -> bool:
 
 def can_action(action_type: str) -> bool:
     return can(ACTION_PERMISSIONS.get(action_type, ""))
+
+
+def can_access_ticket(ticket) -> bool:
+    """报修业务人员只可查看或补充自己提交的工单。"""
+
+    if not auth_enabled():
+        return True
+    user = current_user()
+    if not user or not user.is_active:
+        return False
+    if user.role != "AGENT":
+        return can("ticket:view")
+    return ticket.submitted_by == user.username
 
 
 def _deny_login():

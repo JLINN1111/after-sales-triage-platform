@@ -19,6 +19,7 @@ class Ticket(db.Model):
     alarm_code = db.Column(db.String(32))
     symptom_tags = db.Column(db.JSON)
     submitter_note = db.Column(db.Text)
+    submitted_by = db.Column(db.String(64), index=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     # 二、系统分诊输出字段
