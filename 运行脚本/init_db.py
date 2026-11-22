@@ -18,10 +18,21 @@ from app import create_app, db
 from app.models import Ticket, TicketAction, TicketOutcome, TicketOutcomeReview, TrainingCandidateReview, User  # noqa: F401  导入模型，建表时才能找到它
 
 
+def ensure_training_candidate_review_columns():
+    """为已存在的 SQLite 候选审核表补齐不可自动推断的审核字段。"""
+    if db.engine.dialect.name != "sqlite":
+        return
+    columns = {row[1] for row in db.session.connection().exec_driver_sql("PRAGMA table_info(training_candidate_reviews)")}
+    for name in ("data_scope", "case_family_id"):
+        if name not in columns:
+            db.session.connection().exec_driver_sql(f"ALTER TABLE training_candidate_reviews ADD COLUMN {name} VARCHAR(64)")
+
+
 def init_database():
     app = create_app()
     with app.app_context():
         db.create_all()
+        ensure_training_candidate_review_columns()
         if User.query.count() == 0:
             username = app.config["BOOTSTRAP_ADMIN_USERNAME"].strip()
             password = app.config["BOOTSTRAP_ADMIN_PASSWORD"]

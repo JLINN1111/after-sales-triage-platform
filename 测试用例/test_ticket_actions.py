@@ -584,12 +584,13 @@ class AccessControlTests(unittest.TestCase):
         client = self.app.test_client(); self.login(client, "admin01", "admin-test-password")
         page = client.get("/admin/training-candidates")
         token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
-        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "review_note": "文本和类别经人工复核，可作为正式样本候选。"})
+        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "data_scope": "COURSE_SYNTHETIC", "case_family_id": "COURSE-THERMAL-001", "review_note": "文本和类别经人工复核，可作为正式样本候选。"})
         self.assertEqual(response.status_code, 302)
         with self.app.app_context():
             candidate = TrainingCandidateReview.query.one()
             self.assertEqual(candidate.decision, "ACCEPTED")
             self.assertEqual(candidate.reviewed_category, "THERMAL_COOLING")
+            self.assertEqual(candidate.case_family_id, "COURSE-THERMAL-001")
         repeated = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "REJECTED", "review_note": "重复审核不得覆盖已经完成的样本结论。"})
         self.assertEqual(repeated.status_code, 302)
         with self.app.app_context():
@@ -607,7 +608,7 @@ class AccessControlTests(unittest.TestCase):
         self.assertNotIn(b"13800138000", page.data)
         self.assertIn(b"[PHONE_REDACTED]", page.data)
         token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
-        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "MECHANICAL", "review_note": "人工复核后修订类别，可作为正式样本候选。"})
+        response = client.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "MECHANICAL", "data_scope": "COURSE_SYNTHETIC", "case_family_id": "COURSE-MECHANICAL-001", "review_note": "人工复核后修订类别，可作为正式样本候选。"})
         self.assertEqual(response.status_code, 302)
         with self.app.app_context():
             self.assertEqual(TrainingCandidateReview.query.one().reviewed_category, "MECHANICAL")
@@ -623,7 +624,7 @@ class AccessControlTests(unittest.TestCase):
         admin = self.app.test_client(); self.login(admin, "admin01", "admin-test-password")
         page = admin.get("/admin/training-candidates")
         token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
-        response = admin.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "review_note": "不满足条件的反馈不得形成训练候选审核。"})
+        response = admin.post(f"/admin/training-candidates/{review_id}", data={"csrf_token": token, "decision": "ACCEPTED", "reviewed_category": "THERMAL_COOLING", "data_scope": "COURSE_SYNTHETIC", "case_family_id": "COURSE-THERMAL-001", "review_note": "不满足条件的反馈不得形成训练候选审核。"})
         self.assertEqual(response.status_code, 302)
         with self.app.app_context():
             self.assertEqual(TrainingCandidateReview.query.count(), 0)

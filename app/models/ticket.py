@@ -109,6 +109,8 @@ class TrainingCandidateReview(db.Model):
     outcome_review_id = db.Column(db.Integer, db.ForeignKey("ticket_outcome_reviews.id"), nullable=False, unique=True, index=True)
     decision = db.Column(db.String(16), nullable=False)
     reviewed_category = db.Column(db.String(32))
+    data_scope = db.Column(db.String(32))
+    case_family_id = db.Column(db.String(64))
     review_note = db.Column(db.Text, nullable=False)
     reviewed_by = db.Column(db.String(64), nullable=False)
     reviewed_at = db.Column(db.DateTime, nullable=False, default=datetime.now)

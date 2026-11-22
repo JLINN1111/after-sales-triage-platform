@@ -170,14 +170,16 @@ def review_training_candidate(review_id):
     review = db.get_or_404(TicketOutcomeReview, review_id)
     decision = request.form.get("decision", "")
     category = request.form.get("reviewed_category", "")
+    data_scope = request.form.get("data_scope", "")
+    case_family_id = request.form.get("case_family_id", "").strip()
     note = request.form.get("review_note", "").strip()
     candidate, _reason = candidate_from_outcome(review.outcome)
     if not candidate:
         flash("该反馈不满足训练候选审核条件。")
     elif TrainingCandidateReview.query.filter_by(outcome_review_id=review.id).first():
         flash("该候选已完成样本审核。")
-    elif decision not in {"ACCEPTED", "REJECTED"} or len(note) < 10 or (decision == "ACCEPTED" and category not in TRAINING_CATEGORIES):
-        flash("请填写有效的审核结论、类别和说明。")
+    elif decision not in {"ACCEPTED", "REJECTED"} or len(note) < 10 or (decision == "ACCEPTED" and (category not in TRAINING_CATEGORIES or data_scope != "COURSE_SYNTHETIC" or not re.fullmatch(r"[A-Z0-9][A-Z0-9_-]{2,63}", case_family_id))):
+        flash("接受候选时，请确认课程虚构范围，并填写有效类别、案例家族标识和说明。")
     else:
-        db.session.add(TrainingCandidateReview(outcome_review_id=review.id, decision=decision, reviewed_category=category or None, review_note=note, reviewed_by=current_user().username)); db.session.commit(); flash("已完成样本审核；接受项仍须版本化后才可训练。")
+        db.session.add(TrainingCandidateReview(outcome_review_id=review.id, decision=decision, reviewed_category=category or None, data_scope=data_scope or None, case_family_id=case_family_id or None, review_note=note, reviewed_by=current_user().username)); db.session.commit(); flash("已完成样本审核；接受项仍须版本化后才可训练。")
     return redirect(url_for("auth.training_candidate_list"))
