@@ -300,6 +300,30 @@
     <p class="page-hint">暂未记录处理操作。</p>
     {% endif %}
 
+    <h2 class="section-title">客服参考（大模型，可选）</h2>
+    <p class="page-hint">该部分由可选的大模型生成客服文字参考，默认关闭；开启后也仅作参考，不改变上方分诊结论。</p>
+    {% if llm_reference and llm_reference.status == 'REFERENCE' %}
+    <table class="detail-table">
+        <tr><th>客服摘要</th><td>{{ llm_reference.summary }}</td></tr>
+        <tr><th>建议下一步补问</th><td>{{ llm_reference.next_question }}</td></tr>
+        <tr><th>生成时间</th><td>{{ llm_reference.at.strftime('%Y-%m-%d %H:%M:%S') if llm_reference.at else '-' }}</td></tr>
+        <tr><th>说明</th><td>{{ llm_reference.reasons | join('；') }}</td></tr>
+    </table>
+    <p class="alert alert-warning">以上文字由模型生成，仅供客服核对，不得作为维修结论或安全放行依据。</p>
+    {% elif llm_reference %}
+    <p class="page-hint">最近一次调用状态：{{ llm_reference.status }}{% if llm_reference.reasons %}（{{ llm_reference.reasons | join('；') }}）{% endif %}</p>
+    {% else %}
+    <p class="page-hint">尚未生成客服参考。</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('tickets.llm_reference', ticket_id=ticket.ticket_id) }}" class="action-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-secondary" {% if llm_cooldown %}disabled{% endif %}>
+                {% if llm_cooldown %}冷却中（{{ llm_cooldown }} 秒）{% elif llm_enabled %}生成客服参考{% else %}尝试生成客服参考（当前未启用）{% endif %}
+            </button>
+        </div>
+    </form>
+
     <h2 class="section-title">维修知识参考</h2>
     {% if match_pending %}
     <p class="page-hint">知识检索尚未完成。</p>

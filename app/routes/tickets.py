@@ -18,6 +18,7 @@ from app.services.attachments import prepare_attachments, save_attachments
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
 from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
 from app.services.triage_service import triage_ticket
+from app.services.llm_advisor import configured_invoke, get_llm_reference, is_enabled
 from app.services.access_control import action_permission_required, can_access_ticket, current_user, login_required, permission_required
 
 tickets_bp = Blueprint("tickets", __name__)
@@ -111,6 +112,11 @@ def action_detail(action):
     """把操作留痕中的结构化前后值转换为客服可读的说明。"""
 
     values = action.new_values or {}
+    if action.action_type == "LLM_REFERENCE":
+        status = values.get("llm_status", "UNKNOWN")
+        reasons = values.get("reason_codes", [])
+        labels = {"REFERENCE": "已生成参考", "DISABLED": "未启用", "BLOCKED": "已拦截", "UNKNOWN": "未知"}
+        return f"调用状态：{labels.get(status, status)}；" + "；".join(reasons or ["未记录原因"])
     if action.action_type == "FOLLOW_UP":
         return values.get("customer_follow_up") or action.action_note or "-"
     if action.action_type == "SUPPLEMENT":
@@ -414,6 +420,87 @@ def record_outcome(ticket_id):
     return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
 
 
+def latest_llm_reference(ticket):
+    """取最近一次大模型参考结果；只从留痕读取，不占用工单分诊字段。"""
+    for action in reversed(ticket.actions or []):
+        if action.action_type != "LLM_REFERENCE":
+            continue
+        values = action.new_values or {}
+        return {
+            "status": values.get("llm_status", "UNKNOWN"),
+            "summary": values.get("customer_service_summary"),
+            "next_question": values.get("next_question"),
+            "reasons": values.get("reason_codes", []),
+            "at": action.action_at,
+        }
+    return None
+
+
+def llm_cooldown_remaining(ticket):
+    """只限制已成功生成参考的重复外发；阻断或未启用不占用冷却。"""
+    cooldown = max(0, int(current_app.config.get("LLM_REFERENCE_COOLDOWN_SECONDS", 60)))
+    if not cooldown:
+        return 0
+    for action in reversed(ticket.actions or []):
+        if action.action_type != "LLM_REFERENCE":
+            continue
+        if (action.new_values or {}).get("llm_status") != "REFERENCE":
+            continue
+        elapsed = (datetime.now() - action.action_at).total_seconds()
+        return max(0, int(cooldown - elapsed))
+    return 0
+
+
+def record_llm_reference(ticket, result):
+    """写一条不含外发描述、模型原文或密钥的最小留痕。"""
+    values = {"llm_status": result.get("status", "UNKNOWN"),
+              "reason_codes": [str(r) for r in result.get("reasons", [])]}
+    reference = result.get("reference")
+    if result.get("status") == "REFERENCE" and reference:
+        values["customer_service_summary"] = reference.get("customer_service_summary")
+        values["next_question"] = reference.get("next_question")
+    db.session.add(TicketAction(
+        ticket=ticket,
+        action_type="LLM_REFERENCE",
+        state_before=ticket.action_status,
+        state_after=ticket.action_status,
+        old_values={},
+        new_values=values,
+        action_note="大模型参考仅作客服文字参考，不改变分诊结论；不保存外发描述或模型原文。",
+        action_by="SYSTEM",
+        action_at=datetime.now(),
+    ))
+    db.session.commit()
+
+
+@tickets_bp.route("/tickets/<ticket_id>/llm-reference", methods=["POST"])
+@login_required
+@permission_required("ticket:view")
+def llm_reference(ticket_id):
+    """手动触发一次大模型客服参考；默认关闭时只记一条未启用留痕。"""
+    ticket = Ticket.query.get_or_404(ticket_id)
+    require_ticket_access(ticket)
+
+    remaining = llm_cooldown_remaining(ticket)
+    if remaining:
+        result = {"status": "BLOCKED",
+                  "reasons": [f"同一工单已生成客服参考，请在 {remaining} 秒后再试"],
+                  "reference": None}
+    else:
+        rules_result = triage_ticket(ticket, match_knowledge)
+        invoke = configured_invoke(current_app.config) if is_enabled(current_app.config) else None
+        result = get_llm_reference(ticket, rules_result, invoke)
+    record_llm_reference(ticket, result)
+
+    if result["status"] == "REFERENCE":
+        flash("已生成客服参考文字，仅作参考，不改变分诊结论。")
+    elif result["status"] == "DISABLED":
+        flash("大模型参考未启用：在 .env 中设置 LLM_ENABLED 与 LLM_ALLOW_EXTERNAL_CALLS 为 true 并配置密钥后方可调用。")
+    else:
+        flash("本次未生成参考：" + "；".join(result.get("reasons", [])))
+    return redirect(url_for("tickets.ticket_detail", ticket_id=ticket.ticket_id))
+
+
 @tickets_bp.route("/tickets/<ticket_id>")
 @login_required
 @permission_required("ticket:view")
@@ -441,4 +528,7 @@ def ticket_detail(ticket_id):
         action_note_required=(ticket.action_status == "HUMAN_REVIEW" or needs_handoff_before_close(ticket)),
         resolution_status_zh={"RESOLVED": "已解决", "PARTIALLY_RESOLVED": "部分解决", "UNRESOLVED": "未解决", "UNKNOWN": "暂不确定"},
         status_label=business_status(ticket),
+        llm_enabled=is_enabled(current_app.config),
+        llm_reference=latest_llm_reference(ticket),
+        llm_cooldown=llm_cooldown_remaining(ticket),
     )
