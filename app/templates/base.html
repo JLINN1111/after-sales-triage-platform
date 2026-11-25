@@ -36,7 +36,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, msg in messages %}
-                <div class="alert {% if category == 'success' %}alert-success flash-auto-dismiss{% else %}alert-success{% endif %}" {% if category == 'success' %}data-auto-dismiss="3500"{% endif %}>{{ msg }}</div>
+                <div class="alert alert-success flash-auto-dismiss" data-auto-dismiss="4000">{{ msg }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}

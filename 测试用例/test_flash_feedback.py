@@ -39,9 +39,20 @@ class FlashFeedbackTests(unittest.TestCase):
             "csrf_token": token, "username": "reviewer_demo", "password": "DemoReviewer2026!", "role": "REVIEWER",
         }, follow_redirects=True)
         self.assertIn("已创建账号：reviewer_demo。".encode("utf-8"), response.data)
-        self.assertIn(b'data-auto-dismiss="3500"', response.data)
+        self.assertIn(b'data-auto-dismiss="4000"', response.data)
         refreshed = client.get("/admin/users")
         self.assertNotIn("已创建账号：reviewer_demo。".encode("utf-8"), refreshed.data)
+
+    def test_general_login_feedback_also_has_auto_dismiss_marker(self):
+        client = self.app.test_client()
+        page = client.get("/login")
+        token = re.search(rb'name="csrf_token" value="([^"]+)"', page.data).group(1).decode()
+        response = client.post("/login", data={
+            "csrf_token": token, "username": "admin01", "password": "wrong-password",
+        })
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("账号或密码不正确".encode("utf-8"), response.data)
+        self.assertIn(b'data-auto-dismiss="4000"', response.data)
 
 
 if __name__ == "__main__":
