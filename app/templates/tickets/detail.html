@@ -342,4 +342,4 @@
     {% endif %}
 </div>
 {% endblock %}
-{% block scripts %}{% if can_action('SUPPLEMENT') and ticket.action_status == 'NEED_INFO' %}<script src="{{ url_for('static', filename='js/assistant_chat.js') }}"></script>{% endif %}{% endblock %}
+{% block scripts %}{% if can_action('SUPPLEMENT') and ticket.action_status == 'NEED_INFO' %}<script src="{{ url_for('static', filename='js/assistant_chat.js', v='20261125-2') }}"></script>{% endif %}{% endblock %}

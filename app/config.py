@@ -35,5 +35,6 @@ class Config:
     LLM_DASHSCOPE_MODEL = os.getenv("LLM_DASHSCOPE_MODEL", "qwen-plus")
     LLM_TIMEOUT_SECONDS = int(os.getenv("LLM_TIMEOUT_SECONDS", "15"))
     LLM_MAX_HISTORY_MESSAGES = int(os.getenv("LLM_MAX_HISTORY_MESSAGES", "10"))
-    LLM_MAX_OUTPUT_TOKENS = int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "450"))
+    # 部分推理型模型会先生成内部推理；1200 可避免可见 JSON 在 450 上限内被截断。
+    LLM_MAX_OUTPUT_TOKENS = int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "1200"))
 

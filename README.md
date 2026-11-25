@@ -87,4 +87,6 @@ LLM_PROVIDER=deepseek
 DEEPSEEK_API_KEY=你的密钥
 ```
 
+默认单次输出额度为 1200，避免推理型模型因先生成内部推理而截断可见回复；如在本机 `.env` 中另行设置 `LLM_MAX_OUTPUT_TOKENS`，以本机设置为准。
+
 也可将 `LLM_PROVIDER` 设为 `dashscope`，并配置 `DASHSCOPE_API_KEY`、`LLM_DASHSCOPE_BASE_URL` 和 `LLM_DASHSCOPE_MODEL`。阿里云百炼的兼容地址与工作空间和地域相关，需使用控制台提供的完整地址。密钥只能保存在 `.env`，不得提交到 Git。
