@@ -119,12 +119,18 @@
 
     {% if can_action('SUPPLEMENT') and ticket.action_status == 'NEED_INFO' %}
     <section class="assistant-panel" data-mode="ticket" data-ticket-url="{{ url_for('assistant.create_ticket_session', ticket_id=ticket.ticket_id) }}">
-        <h3 class="subsection-title">对话式补充信息</h3>
-        <p class="page-hint">可直接回答售后人员的补问。助手仅整理新补充的字段，不重复当前分诊或知识资料。</p>
-        <div class="assistant-history" aria-live="polite"></div>
-        <label for="assistant_input">补充信息</label>
-        <textarea id="assistant_input" rows="3" placeholder="例如：设备目前已经停机，屏幕显示报警代码 253。"></textarea>
-        <div class="form-actions"><button type="button" class="btn btn-secondary assistant-send">发送给助手</button></div>
+        <div class="assistant-window-header">
+            <div><span class="assistant-avatar">智</span><span><strong>报修信息助手</strong><small>仅帮助整理本次新增的补充信息</small></span></div>
+            <span class="assistant-status">待补充</span>
+        </div>
+        <div class="assistant-history" aria-live="polite">
+            <div class="assistant-message assistant intro">请直接回答售后人员的补问，我会把可确认的信息整理为下方表单字段。</div>
+        </div>
+        <div class="assistant-composer">
+            <textarea id="assistant_input" rows="2" placeholder="输入补充信息；按 Enter 发送，Shift + Enter 换行"></textarea>
+            <button type="button" class="btn btn-primary assistant-send">发送</button>
+        </div>
+        <p class="assistant-disclaimer">助手不会重复当前分诊或知识资料，也不会直接修改工单。</p>
     </section>
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

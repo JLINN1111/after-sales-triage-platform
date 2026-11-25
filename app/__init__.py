@@ -45,7 +45,7 @@ def create_app(config_overrides=None):
 
     @app.get("/")
     def index():
-        return redirect(url_for("tickets.list_tickets"))
+        return redirect(url_for("auth.role_home"))
 
     from app.routes.auth import auth_bp
     from app.routes.assistant import assistant_bp

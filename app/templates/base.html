@@ -10,12 +10,15 @@
 <body>
     <header class="site-header">
         <div class="header-inner">
-            <a class="site-title" href="{{ url_for('tickets.list_tickets') }}">售后报修智能分诊平台</a>
+            <a class="site-title" href="{{ url_for('auth.role_home') }}">售后报修智能分诊平台</a>
             <nav class="site-nav">
                 {% if current_user %}
-                    {% if can('ticket:submit') %}<a href="{{ url_for('tickets.new_ticket') }}">提交报修</a>{% endif %}
-                    <a href="{{ url_for('tickets.list_tickets') }}">工单列表</a>
-                    {% if can('user:manage') %}
+                    {% if current_user.role == 'AGENT' %}
+                        <a href="{{ url_for('tickets.new_ticket') }}">提交报修</a>
+                        <a href="{{ url_for('tickets.list_tickets') }}">我的报修</a>
+                    {% elif current_user.role == 'REVIEWER' %}
+                        <a href="{{ url_for('tickets.list_tickets') }}">工单处理</a>
+                    {% elif current_user.role == 'ADMIN' %}
                         <a href="{{ url_for('knowledge.list_entries') }}">知识库管理</a>
                         <a href="{{ url_for('auth.user_list') }}">账户管理</a>
                     {% endif %}

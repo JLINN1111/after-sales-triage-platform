@@ -35,6 +35,16 @@ def login():
     session.clear()
     session["user_id"] = user.id
     flash(f"已登录：{user.username}（{ROLE_LABELS.get(user.role, user.role)}）。")
+    return redirect(url_for("auth.role_home"))
+
+
+@auth_bp.get("/home")
+@login_required
+def role_home():
+    """按角色进入唯一的工作入口，避免跨角色浏览业务页面。"""
+    user = current_user()
+    if user and user.role == "ADMIN":
+        return redirect(url_for("auth.user_list"))
     return redirect(url_for("tickets.list_tickets"))
 
 

@@ -15,7 +15,7 @@ ROLE_LABELS = {
 }
 
 ROLE_PERMISSIONS = {
-    "ADMIN": {"ticket:view", "ticket:submit", "ticket:attach", "ticket:follow_up", "ticket:review", "ticket:delete", "outcome:record", "user:manage"},
+    "ADMIN": {"user:manage", "knowledge:manage"},
     "AGENT": {"ticket:view", "ticket:submit", "ticket:attach", "ticket:supplement"},
     "REVIEWER": {"ticket:view", "ticket:attach", "ticket:follow_up", "ticket:review", "outcome:record"},
 }
@@ -73,7 +73,7 @@ def _deny_permission():
     if request.is_json:
         return jsonify({"error": "当前角色无权执行此操作。"}), 403
     flash("当前角色无权执行此操作。")
-    return redirect(url_for("tickets.list_tickets"))
+    return redirect(url_for("auth.role_home"))
 
 
 def login_required(view):

@@ -54,7 +54,7 @@ def _apply_values(entry, values):
 
 @knowledge_bp.get("/knowledge")
 @login_required
-@permission_required("user:manage")
+@permission_required("knowledge:manage")
 def list_entries():
     entries = KnowledgeEntry.query.order_by(KnowledgeEntry.is_active.desc(), KnowledgeEntry.updated_at.desc()).all()
     return render_template(
@@ -65,7 +65,7 @@ def list_entries():
 
 @knowledge_bp.post("/knowledge")
 @login_required
-@permission_required("user:manage")
+@permission_required("knowledge:manage")
 def create_entry():
     values = _values()
     error = _validate(values)
@@ -83,7 +83,7 @@ def create_entry():
 
 @knowledge_bp.route("/knowledge/<knowledge_id>/edit", methods=["GET", "POST"])
 @login_required
-@permission_required("user:manage")
+@permission_required("knowledge:manage")
 def edit_entry(knowledge_id):
     entry = db.session.get(KnowledgeEntry, knowledge_id)
     if entry is None:
@@ -103,7 +103,7 @@ def edit_entry(knowledge_id):
 
 @knowledge_bp.post("/knowledge/<knowledge_id>/status")
 @login_required
-@permission_required("user:manage")
+@permission_required("knowledge:manage")
 def toggle_status(knowledge_id):
     entry = db.session.get(KnowledgeEntry, knowledge_id)
     if entry is None:

@@ -8,6 +8,7 @@
   let sessionId = panel.querySelector('.assistant-session-id')?.value || '';
 
   const fieldNames = ['equipment_type', 'equipment_model', 'occurred_at', 'operating_state', 'shutdown', 'safety_risk', 'alarm_code_status', 'alarm_code', 'submitter_note'];
+  const fieldLabels = {equipment_type: '设备类型', equipment_model: '设备型号', occurred_at: '故障发生时间', operating_state: '运行状态', shutdown: '是否停机', safety_risk: '安全风险', alarm_code_status: '报警代码状态', alarm_code: '报警代码', submitter_note: '补充说明'};
   const formContext = () => Object.fromEntries(fieldNames.map((name) => [name, document.querySelector(`[name="${name}"]`)?.value || '']));
   const request = async (url, body) => {
     const response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf}, body: JSON.stringify(body)});
@@ -20,6 +21,7 @@
     item.className = `assistant-message ${kind}`;
     item.textContent = text;
     history.appendChild(item);
+    history.scrollTop = history.scrollHeight;
   };
   const ensureSession = async () => {
     if (sessionId) return sessionId;
@@ -35,7 +37,11 @@
     if (!fields.length) return;
     const box = document.createElement('div');
     box.className = 'assistant-suggestion';
-    box.textContent = `可采用字段：${fields.map((name) => `${name}=${data.field_suggestions[name]}`).join('；')}`;
+    const title = document.createElement('strong');
+    title.textContent = '可采用的信息';
+    const content = document.createElement('span');
+    content.textContent = fields.map((name) => `${fieldLabels[name] || name}：${data.field_suggestions[name]}`).join('；');
+    box.append(title, content);
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'btn btn-secondary'; button.textContent = '采用建议填入表单';
     button.addEventListener('click', async () => {
@@ -48,7 +54,7 @@
         button.disabled = true; button.textContent = '已填入，提交前请核对';
       } catch (error) { add('error', error.message); }
     });
-    box.appendChild(document.createElement('br')); box.appendChild(button); history.appendChild(box);
+    box.appendChild(button); history.appendChild(box); history.scrollTop = history.scrollHeight;
   };
   sendButton.addEventListener('click', async () => {
     const message = input.value.trim();
@@ -64,5 +70,11 @@
       renderSuggestion(data);
     } catch (error) { add('error', error.message); }
     finally { sendButton.disabled = false; }
+  });
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      sendButton.click();
+    }
   });
 })();
