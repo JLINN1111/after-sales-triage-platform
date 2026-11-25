@@ -54,6 +54,7 @@ class Ticket(db.Model):
     )
     outcomes = db.relationship("TicketOutcome", back_populates="ticket", cascade="all, delete-orphan", order_by="TicketOutcome.recorded_at")
     attachments = db.relationship("TicketAttachment", back_populates="ticket", cascade="all, delete-orphan", order_by="TicketAttachment.uploaded_at")
+    conversations = db.relationship("ConversationSession", back_populates="ticket")
 
 
 class TicketAction(db.Model):

@@ -13,7 +13,7 @@ from pathlib import Path
 from flask import Blueprint, abort, current_app, flash, jsonify, redirect, render_template, request, send_from_directory, url_for
 
 from app import db
-from app.models import Ticket, TicketAction, TicketAttachment, TicketOutcome
+from app.models import ConversationSession, Ticket, TicketAction, TicketAttachment, TicketOutcome
 from app.services.attachments import prepare_attachments, save_attachments
 from app.services.knowledge_matcher import load_knowledge, match_knowledge
 from app.services.ticket_actions import apply_ticket_action, initial_action_status, needs_handoff_before_close
@@ -268,6 +268,11 @@ def new_ticket():
         action_status="NEW",
     )
     apply_triage(ticket)
+    assistant_session_id = request.form.get("assistant_session_id", "")
+    if assistant_session_id:
+        session = db.session.get(ConversationSession, assistant_session_id)
+        if session and session.ticket_id is None and session.owner_username == (current_user().username if current_user() else "SYSTEM"):
+            session.ticket = ticket
     db.session.add(ticket)
     db.session.add_all(save_attachments(
         ticket,

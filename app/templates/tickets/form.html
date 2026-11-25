@@ -51,6 +51,16 @@
             <textarea id="description" name="description" rows="4" placeholder="描述观察到的现象，10 字以上">{{ form.description }}</textarea>
         </div>
 
+        <section class="assistant-panel" data-mode="draft" data-create-url="{{ url_for('assistant.create_draft_session') }}">
+            <h2 class="subsection-title">对话式补充信息</h2>
+            <p class="page-hint">可用自然语言补充故障现象。助手只帮助追问和整理字段，不判断故障类别、不提供维修结论。</p>
+            <div class="assistant-history" aria-live="polite"></div>
+            <label for="assistant_input">继续描述或回答问题</label>
+            <textarea id="assistant_input" rows="3" placeholder="例如：设备运行十分钟后控制柜发热，屏幕有报警。"></textarea>
+            <div class="form-actions"><button type="button" class="btn btn-secondary assistant-send">发送给助手</button></div>
+            <input type="hidden" name="assistant_session_id" class="assistant-session-id">
+        </section>
+
         <div class="form-row">
             <div class="form-field">
                 <label for="operating_state">发生时运行状态</label>
@@ -113,3 +123,4 @@
     </form>
 </div>
 {% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/assistant_chat.js') }}"></script>{% endblock %}

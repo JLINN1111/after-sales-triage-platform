@@ -118,6 +118,14 @@
     {% endif %}
 
     {% if can_action('SUPPLEMENT') and ticket.action_status == 'NEED_INFO' %}
+    <section class="assistant-panel" data-mode="ticket" data-ticket-url="{{ url_for('assistant.create_ticket_session', ticket_id=ticket.ticket_id) }}">
+        <h3 class="subsection-title">对话式补充信息</h3>
+        <p class="page-hint">可直接回答售后人员的补问。助手仅整理新补充的字段，不重复当前分诊或知识资料。</p>
+        <div class="assistant-history" aria-live="polite"></div>
+        <label for="assistant_input">补充信息</label>
+        <textarea id="assistant_input" rows="3" placeholder="例如：设备目前已经停机，屏幕显示报警代码 253。"></textarea>
+        <div class="form-actions"><button type="button" class="btn btn-secondary assistant-send">发送给助手</button></div>
+    </section>
     <form method="post" action="{{ url_for('tickets.ticket_action', ticket_id=ticket.ticket_id) }}" class="action-form">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action_type" value="SUPPLEMENT">
@@ -328,3 +336,4 @@
     {% endif %}
 </div>
 {% endblock %}
+{% block scripts %}{% if can_action('SUPPLEMENT') and ticket.action_status == 'NEED_INFO' %}<script src="{{ url_for('static', filename='js/assistant_chat.js') }}"></script>{% endif %}{% endblock %}

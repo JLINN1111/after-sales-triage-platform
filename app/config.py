@@ -23,4 +23,17 @@ class Config:
     MAX_ATTACHMENTS_PER_TICKET = 5
     MAX_CONTENT_LENGTH = 26 * 1024 * 1024
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # 对话式信息采集助手：默认关闭，只有明确允许后才向外部模型发送脱敏文本。
+    LLM_ENABLED = os.getenv("LLM_ENABLED", "false").lower() == "true"
+    LLM_ALLOW_EXTERNAL_CALLS = os.getenv("LLM_ALLOW_EXTERNAL_CALLS", "false").lower() == "true"
+    LLM_PROVIDER = os.getenv("LLM_PROVIDER", "deepseek").strip().lower()
+    DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+    LLM_DEEPSEEK_BASE_URL = os.getenv("LLM_DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+    LLM_DEEPSEEK_MODEL = os.getenv("LLM_DEEPSEEK_MODEL", "deepseek-v4-flash")
+    DASHSCOPE_API_KEY = os.getenv("DASHSCOPE_API_KEY", "")
+    LLM_DASHSCOPE_BASE_URL = os.getenv("LLM_DASHSCOPE_BASE_URL", "")
+    LLM_DASHSCOPE_MODEL = os.getenv("LLM_DASHSCOPE_MODEL", "qwen-plus")
+    LLM_TIMEOUT_SECONDS = int(os.getenv("LLM_TIMEOUT_SECONDS", "15"))
+    LLM_MAX_HISTORY_MESSAGES = int(os.getenv("LLM_MAX_HISTORY_MESSAGES", "10"))
+    LLM_MAX_OUTPUT_TOKENS = int(os.getenv("LLM_MAX_OUTPUT_TOKENS", "450"))
 

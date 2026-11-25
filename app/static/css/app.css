@@ -55,6 +55,18 @@ a:hover { text-decoration: underline; }
 .action-form { margin-bottom: 18px; }
 .btn:disabled { cursor: wait; opacity: 0.65; }
 
+.assistant-panel { margin: 18px 0; padding: 16px; border: 1px solid #bdd1e8; border-radius: 6px; background: #f8fbff; }
+.assistant-panel > label { display: block; margin-top: 12px; font-weight: 600; }
+.assistant-panel textarea { width: 100%; margin-top: 6px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font: inherit; resize: vertical; }
+.assistant-history { display: grid; gap: 8px; }
+.assistant-message, .assistant-suggestion { padding: 9px 11px; border-radius: 5px; line-height: 1.55; }
+.assistant-message.user { background: #e9f2fb; }
+.assistant-message.assistant { background: #fff; border: 1px solid #dfe7ef; }
+.assistant-message.warning { color: #8a4200; background: #fff3e2; }
+.assistant-message.error { color: #a5281b; background: #fdecea; }
+.assistant-message.hint { color: #4d6175; background: #eef3f8; }
+.assistant-suggestion { background: #f2f8ef; border: 1px solid #cfe2c3; }
+
 .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 18px; }
 .card h2 { margin-top: 0; font-size: 16px; }
 .muted { color: #667085; font-size: 13px; }
