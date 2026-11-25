@@ -90,6 +90,28 @@ def _normalize_turn(value, user_text):
     return {"reply": reply, "field_suggestions": clean, "needs_confirmation": needed, "urgent_risk_hint": risk}
 
 
+def _parse_model_content(content):
+    """兼容模型直接返回 JSON，或在代码块、简短说明外包裹 JSON 的情形。"""
+    if isinstance(content, dict):
+        return content
+    if not isinstance(content, str):
+        raise ValueError("模型没有返回文本内容")
+    text = content.strip()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        decoder = json.JSONDecoder()
+        for index, char in enumerate(text):
+            if char != "{":
+                continue
+            try:
+                value, _ = decoder.raw_decode(text[index:])
+                return value
+            except json.JSONDecodeError:
+                continue
+    raise ValueError("未找到 JSON 对象")
+
+
 def _call_remote(messages):
     if not current_app.config["LLM_ENABLED"] or not current_app.config["LLM_ALLOW_EXTERNAL_CALLS"]:
         raise AssistantUnavailable("对话助手尚未启用；请继续使用表单填写报修信息。")
@@ -113,8 +135,9 @@ def _call_remote(messages):
         detail = body["error"].get("message", "请求被模型服务拒绝。") if isinstance(body["error"], dict) else str(body["error"])
         raise AssistantUnavailable(f"模型服务返回错误：{_text(detail, 180)}")
     try:
-        return json.loads(body["choices"][0]["message"]["content"]), current_app.config["LLM_PROVIDER"], model
-    except (KeyError, IndexError, TypeError, json.JSONDecodeError) as error:
+        content = body["choices"][0]["message"]["content"]
+        return _parse_model_content(content), current_app.config["LLM_PROVIDER"], model
+    except (KeyError, IndexError, TypeError, ValueError) as error:
         raise AssistantUnavailable("模型未返回可解析内容，请改为手工填写。") from error
 
 

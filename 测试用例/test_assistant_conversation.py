@@ -6,6 +6,7 @@ from pathlib import Path
 
 from app import create_app, db
 from app.models import ConversationMessage, ConversationSession, Ticket
+from app.services.assistant_service import _parse_model_content
 
 
 def fake_turn(_messages):
@@ -94,6 +95,12 @@ class AssistantConversationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         with self.app.app_context():
             self.assertIsNotNone(db.session.get(ConversationSession, session_id).ticket_id)
+
+    def test_accepts_json_wrapped_in_model_markdown_response(self):
+        content = "模型整理如下：\n```json\n{\"reply\": \"请确认是否停机。\", \"field_suggestions\": {\"shutdown\": \"YES\"}, \"needs_confirmation\": [], \"urgent_risk_hint\": false}\n```"
+        parsed = _parse_model_content(content)
+        self.assertEqual(parsed["reply"], "请确认是否停机。")
+        self.assertEqual(parsed["field_suggestions"]["shutdown"], "YES")
 
 
 if __name__ == "__main__":
