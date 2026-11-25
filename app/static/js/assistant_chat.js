@@ -9,6 +9,14 @@
 
   const fieldNames = ['equipment_type', 'equipment_model', 'occurred_at', 'operating_state', 'shutdown', 'safety_risk', 'alarm_code_status', 'alarm_code', 'submitter_note'];
   const fieldLabels = {equipment_type: '设备类型', equipment_model: '设备型号', occurred_at: '故障发生时间', operating_state: '运行状态', shutdown: '是否停机', safety_risk: '安全风险', alarm_code_status: '报警代码状态', alarm_code: '报警代码', submitter_note: '补充说明'};
+  const fieldValueLabels = {
+    equipment_type: {CNC: '数控机床/加工设备', INJECTION: '注塑机', CONVEYOR: '输送线/传送带', AIR_COMPRESSOR: '空压机', VFD: '电机控制箱/变频器', OTHER: '其他设备/不清楚'},
+    operating_state: {STARTING: '启动中', RUNNING: '运行中', STANDBY: '待机', STOPPED: '已停机', UNKNOWN: '暂不清楚'},
+    shutdown: {YES: '已停机', NO: '未停机', UNKNOWN: '暂不清楚'},
+    safety_risk: {YES: '存在安全风险', NO: '暂未发现安全风险', UNKNOWN: '暂不清楚'},
+    alarm_code_status: {PRESENT: '有报警代码', NONE: '无报警代码', UNKNOWN: '暂不清楚'},
+  };
+  const formatValue = (name, value) => fieldValueLabels[name]?.[value] || value;
   const formContext = () => Object.fromEntries(fieldNames.map((name) => [name, document.querySelector(`[name="${name}"]`)?.value || '']));
   const request = async (url, body) => {
     const response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf}, body: JSON.stringify(body)});
@@ -40,7 +48,7 @@
     const title = document.createElement('strong');
     title.textContent = '可采用的信息';
     const content = document.createElement('span');
-    content.textContent = fields.map((name) => `${fieldLabels[name] || name}：${data.field_suggestions[name]}`).join('；');
+    content.textContent = fields.map((name) => `${fieldLabels[name] || '补充信息'}：${formatValue(name, data.field_suggestions[name])}`).join('；');
     box.append(title, content);
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'btn btn-secondary'; button.textContent = '采用建议填入表单';
@@ -66,7 +74,7 @@
       const data = await request(`/assistant/sessions/${sessionId}/messages`, {message, form_context: formContext()});
       add('assistant', data.reply);
       if (data.urgent_risk_hint) add('warning', '检测到可能的安全风险，请停止继续操作并联系售后人员确认。');
-      if ((data.needs_confirmation || []).length) add('hint', `仍需确认：${data.needs_confirmation.join('、')}`);
+      if ((data.needs_confirmation || []).length) add('hint', `仍需确认：${data.needs_confirmation.map((name) => fieldLabels[name] || '相关信息').join('、')}`);
       renderSuggestion(data);
     } catch (error) { add('error', error.message); }
     finally { sendButton.disabled = false; }
