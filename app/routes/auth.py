@@ -81,7 +81,7 @@ def create_user():
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        flash(f"已创建账号：{username}。")
+        flash(f"已创建账号：{username}。", "success")
     return redirect(url_for("auth.user_list"))
 
 @auth_bp.post("/admin/users/<int:user_id>/role")

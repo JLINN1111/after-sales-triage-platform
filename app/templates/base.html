@@ -33,13 +33,16 @@
     </header>
 
     <main class="container">
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for msg in messages %}<div class="alert alert-success">{{ msg }}</div>{% endfor %}
+                {% for category, msg in messages %}
+                <div class="alert {% if category == 'success' %}alert-success flash-auto-dismiss{% else %}alert-success{% endif %}" {% if category == 'success' %}data-auto-dismiss="3500"{% endif %}>{{ msg }}</div>
+                {% endfor %}
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
     {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/flash_messages.js') }}"></script>
 </body>
 </html>
