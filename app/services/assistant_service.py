@@ -109,6 +109,9 @@ def _call_remote(messages):
         raise AssistantUnavailable(f"模型服务暂时不可用（HTTP {error.code}），请改为手工填写。") from error
     except (URLError, TimeoutError, json.JSONDecodeError) as error:
         raise AssistantUnavailable("模型服务连接失败或超时，请改为手工填写。") from error
+    if isinstance(body, dict) and body.get("error"):
+        detail = body["error"].get("message", "请求被模型服务拒绝。") if isinstance(body["error"], dict) else str(body["error"])
+        raise AssistantUnavailable(f"模型服务返回错误：{_text(detail, 180)}")
     try:
         return json.loads(body["choices"][0]["message"]["content"]), current_app.config["LLM_PROVIDER"], model
     except (KeyError, IndexError, TypeError, json.JSONDecodeError) as error:
@@ -123,6 +126,9 @@ def generate_turn(session, user_text, form_context):
     history = list(session.messages)[-current_app.config["LLM_MAX_HISTORY_MESSAGES"]:]
     messages = [{"role": "system", "content": _system_prompt(redact_context(form_context))}]
     messages.extend({"role": "user" if item.speaker == "USER" else "assistant", "content": _text(item.content, 800)} for item in history)
+    # 路由会先保存用户消息；此处仍保证独立调用时本轮输入不会遗漏或重复。
+    if not history or history[-1].speaker != "USER" or history[-1].content != user_text:
+        messages.append({"role": "user", "content": user_text})
     generator = current_app.config.get("ASSISTANT_TURN_GENERATOR")
     if generator:
         raw = generator(messages)
