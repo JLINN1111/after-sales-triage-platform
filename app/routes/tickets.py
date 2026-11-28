@@ -74,20 +74,33 @@ DISPLAY = {
 
 
 def translate_evidence(codes):
-    """把判断依据代码翻译成中文；含关键词后缀的按前缀匹配。"""
+    """将内部判断依据转换为业务可读说明，不向页面回退输出内部代码。"""
+
     out = []
+    conflict_seen = False
+    category_prefix = "RULE-CATEGORY-"
+    conflict_prefix = "RULE-CATEGORY-CONFLICT:"
+
     for code in codes or []:
+        if not isinstance(code, str):
+            continue
         if code in DISPLAY["evidence"]:
             out.append(DISPLAY["evidence"][code])
             continue
-        base, _, keyword = code.partition(":")
-        if base.startswith("RULE-CATEGORY-") and keyword:
-            category = base.split("RULE-CATEGORY-", 1)[1]
-            zh = DISPLAY["category_code"].get(category, category)
-            out.append(f"命中“{keyword}”，判为{zh}")
+        if code.startswith(conflict_prefix):
+            # 冲突明细中携带的是内部类别代码，只保留可供售后判断的业务结论。
+            if not conflict_seen:
+                out.append("描述中存在多个异常方向的线索，需人工核对")
+                conflict_seen = True
             continue
-        out.append(DISPLAY["evidence"].get(base) or code)
-    return out
+        if code.startswith(category_prefix) and ":" in code:
+            category_and_keyword = code[len(category_prefix):]
+            category, keyword = category_and_keyword.split(":", 1)
+            category_zh = DISPLAY["category_code"].get(category)
+            if category_zh and keyword:
+                out.append(f"描述中提及“{keyword}”，与{category_zh}相关")
+
+    return list(dict.fromkeys(out))
 
 
 def knowledge_details(ids, fallback_ids=None):

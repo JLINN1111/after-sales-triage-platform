@@ -7,32 +7,44 @@
     <title>{% block title %}售后报修智能分诊平台{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
-<body>
-    <header class="site-header">
-        <div class="header-inner">
-            <a class="site-title" href="{{ url_for('auth.role_home') }}">售后报修智能分诊平台</a>
-            <nav class="site-nav">
-                {% if current_user %}
-                    {% if current_user.role == 'AGENT' %}
-                        <a href="{{ url_for('tickets.new_ticket') }}">提交报修</a>
-                        <a href="{{ url_for('tickets.list_tickets') }}">我的报修</a>
-                    {% elif current_user.role == 'REVIEWER' %}
-                        <a href="{{ url_for('tickets.list_tickets') }}">工单处理</a>
-                    {% elif current_user.role == 'ADMIN' %}
-                        <a href="{{ url_for('knowledge.list_entries') }}">知识库管理</a>
-                        <a href="{{ url_for('auth.user_list') }}">账户管理</a>
-                    {% endif %}
-                    <span>{{ current_user.username }}（{{ role_labels.get(current_user.role, current_user.role) }}）</span>
+<body class="{% if not current_user %}is-guest{% endif %}">
+    {% if current_user %}
+    <div class="app-shell">
+        <aside class="site-sidebar">
+            <a class="brand" href="{{ url_for('auth.role_home') }}">
+                <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span><strong>智维服务</strong><small>设备售后服务平台</small></span>
+            </a>
+            <nav class="sidebar-nav" aria-label="主导航">
+                <p class="nav-caption">业务工作台</p>
+                {% if current_user.role == 'AGENT' %}
+                    <a href="{{ url_for('tickets.new_ticket') }}"><span class="nav-icon">＋</span>提交报修</a>
+                    <a href="{{ url_for('tickets.list_tickets') }}"><span class="nav-icon">▤</span>我的报修</a>
+                {% elif current_user.role == 'REVIEWER' %}
+                    <a href="{{ url_for('tickets.list_tickets') }}"><span class="nav-icon">▤</span>工单处理</a>
+                {% elif current_user.role == 'ADMIN' %}
+                    <a href="{{ url_for('knowledge.list_entries') }}"><span class="nav-icon">◇</span>知识库管理</a>
+                    <a href="{{ url_for('auth.user_list') }}"><span class="nav-icon">◉</span>账户管理</a>
+                {% endif %}
+            </nav>
+            <div class="sidebar-foot">© 2026 智维服务<br>本地业务演示环境</div>
+        </aside>
+        <section class="app-main">
+            <header class="workspace-header">
+                <div class="workspace-context"><span class="context-dot"></span>售后服务工作台</div>
+                <div class="account-menu">
+                    <span class="account-avatar">{{ current_user.username[:1]|upper }}</span>
+                    <span><strong>{{ current_user.username }}</strong><small>{{ role_labels.get(current_user.role, current_user.role) }}</small></span>
                     <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn-link">退出</button>
                     </form>
-                {% endif %}
-            </nav>
-        </div>
-    </header>
-
-    <main class="container">
+                </div>
+            </header>
+            <main class="container">
+    {% else %}
+    <main class="container guest-container">
+    {% endif %}
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, msg in messages %}
@@ -42,6 +54,7 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
+    {% if current_user %}</section></div>{% endif %}
     {% block scripts %}{% endblock %}
     <script src="{{ url_for('static', filename='js/flash_messages.js') }}"></script>
 </body>
